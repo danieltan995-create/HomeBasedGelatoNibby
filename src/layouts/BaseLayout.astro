@@ -10,7 +10,9 @@ import { flavours } from '../data/flavours';
 import { validateBusinessConfig } from '../lib/validation';
 validateBusinessConfig(business, flavours);
 const title = `${business.name} | Home-based gelato in ${business.area}`;
-const description = 'Little cups. Big happiness. Explore Lemon Almond Nibs, Dark Chocolate and Pistachio My Love from Nibby Gelato, a home-based gelato brand in Melaka.';
+const revealedNames = flavours.filter((flavour) => flavour.availability !== 'coming-soon').map(({ name }) => name).join(', ');
+const upcomingNote = flavours.some((flavour) => flavour.availability === 'coming-soon') ? ' A mystery flavour is coming soon.' : '';
+const description = `Little cups. Big happiness. Explore ${revealedNames || 'the upcoming lineup'} from ${business.name}, a home-based gelato brand in ${business.area}.${upcomingNote}`;
 const canonical = business.mode === 'live' && business.siteUrl ? new URL('/', business.siteUrl).href : null;
 const assetPath = (fileName: string) => `${import.meta.env.BASE_URL.replace(/\/$/, '')}/${fileName}`;
 ---

@@ -64,7 +64,7 @@ describe('initial data and flavour validation', () => {
         priceMinor: null,
         volumeMl: 140,
         volumeApproximate: true,
-        availability: 'unconfirmed',
+        availability: flavour.id === pistachioId ? 'coming-soon' : 'unconfirmed',
         allergens: null,
         contentReviewed: false,
       });
@@ -75,6 +75,10 @@ describe('initial data and flavour validation', () => {
 
   it('rejects an empty menu', () => {
     expect(() => validateFlavours([])).toThrow();
+  });
+
+  it('rejects an unsupported runtime availability value', () => {
+    expect(() => validateFlavours(withLemon({ availability: 'typo' as Flavour['availability'] }))).toThrow(/availability/);
   });
 
   it('rejects duplicate IDs even when the products have different names', () => {
@@ -182,6 +186,17 @@ describe('business configuration validation', () => {
     expect(() => validateBusinessConfig(liveBusiness, menu)).not.toThrow();
   });
 
+  it('allows an unorderable teaser alongside reviewed live products, but still requires review on reveal', () => {
+    const teaser = flavours.find(({ id }) => id === pistachioId)!;
+    const menu = reviewedMenu().map((flavour) => flavour.id === pistachioId ? teaser : flavour);
+    expect(() => validateBusinessConfig(liveBusiness, menu)).not.toThrow();
+    for (const availability of ['unconfirmed', 'available', 'sold-out'] as const) {
+      const revealed = menu.map((flavour) => flavour.id === pistachioId ? { ...teaser, availability } : flavour);
+      expect(() => validateBusinessConfig(liveBusiness, revealed)).toThrow(/revealed flavour/);
+    }
+    expect(() => validateBusinessConfig({ ...liveBusiness, contactVerified: false }, menu)).toThrow();
+  });
+
   it('also applies basic flavour validation to live data', () => {
     expect(() => validateBusinessConfig(liveBusiness, [])).toThrow();
     expect(() => validateBusinessConfig(liveBusiness, withLemon({ priceMinor: -1 }, reviewedMenu()))).toThrow();
@@ -226,16 +241,18 @@ describe('order selection', () => {
     expect(selection).toEqual({ [lemonId]: 2 });
   });
 
-  it.each([0, 1, 99])('blocks unknown and sold-out targets even for quantity %i', (quantity) => {
+  it.each([0, 1, 99])('blocks unknown, sold-out and coming-soon targets even for quantity %i', (quantity) => {
     expect(() => setQuantity({}, flavours, 'not-on-menu', quantity)).toThrow();
     expect(() => setQuantity({}, withLemon({ availability: 'sold-out' }), lemonId, quantity)).toThrow();
+    expect(() => setQuantity({}, flavours, pistachioId, quantity)).toThrow(/unavailable/i);
   });
 
   it('returns every selected flavour and quantity, including the upper boundary', () => {
+    const menu = reviewedMenu(); // Explicitly released fixture, not the upcoming real menu.
     const selection: OrderSelection = Object.freeze({ [lemonId]: 1, [chocolateId]: 99, [pistachioId]: 4 });
-    const lines = orderLines(selection, flavours);
+    const lines = orderLines(selection, menu);
     expect(lines).toHaveLength(3);
-    expect(lines).toEqual(expect.arrayContaining(flavours.map((flavour) => ({
+    expect(lines).toEqual(expect.arrayContaining(menu.map((flavour) => ({
       flavour,
       quantity: selection[flavour.id],
     }))));
@@ -254,6 +271,8 @@ describe('order selection', () => {
     expect(() => orderLines({ [lemonId]: 1 }, soldOutMenu)).toThrow();
     expect(() => setQuantity({ 'not-on-menu': 1 }, flavours, chocolateId, 1)).toThrow();
     expect(() => setQuantity({ [lemonId]: 1 }, soldOutMenu, chocolateId, 1)).toThrow();
+    expect(() => orderLines({ [pistachioId]: 1 }, flavours)).toThrow(/unavailable/i);
+    expect(() => setQuantity({ [pistachioId]: 1 }, flavours, chocolateId, 1)).toThrow(/unavailable/i);
   });
 });
 
@@ -303,6 +322,7 @@ describe('subtotal', () => {
     expect(() => calculateSubtotal({ 'not-on-menu': 1 }, flavours, currency)).toThrow();
     expect(() => calculateSubtotal({ [lemonId]: 0 }, flavours, currency)).toThrow();
     expect(() => calculateSubtotal({ [lemonId]: 1 }, withLemon({ availability: 'sold-out' }), currency)).toThrow();
+    expect(() => calculateSubtotal({ [pistachioId]: 1 }, flavours, currency)).toThrow(/unavailable/i);
   });
 });
 

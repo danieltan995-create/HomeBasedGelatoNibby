@@ -12,6 +12,9 @@ export function validateFlavours(menu: readonly Flavour[]): void {
       throw new Error('Flavour IDs must be unique lowercase slugs.');
     }
     ids.add(item.id);
+    if (!['unconfirmed', 'available', 'sold-out', 'coming-soon'].includes(item.availability)) {
+      throw new Error(`Invalid availability for ${item.id}.`);
+    }
     if (!item.name.trim() || !Number.isSafeInteger(item.volumeMl) || item.volumeMl <= 0) {
       throw new Error(`Invalid name or volume for ${item.id}.`);
     }
@@ -39,8 +42,10 @@ export function validateBusinessConfig(config: BusinessConfig, menu: readonly Fl
     if (!config.launchReviewed || !config.contactVerified || !config.whatsappNumber || !config.currency || !config.siteUrl || !config.fulfilment?.trim()) {
       throw new Error('Live launch blocked: review contact, currency, site URL and fulfilment first.');
     }
-    if (menu.some((item) => item.priceMinor === null || !item.contentReviewed || item.volumeApproximate || !item.allergens?.trim() || item.availability === 'unconfirmed')) {
-      throw new Error('Live launch blocked: confirm every flavour’s price, volume, availability and allergen information.');
+    // Teasers expose no product details or ordering control. Require the usual
+    // review as soon as a flavour leaves coming-soon, even if it is sold out.
+    if (menu.some((item) => item.availability !== 'coming-soon' && (item.priceMinor === null || !item.contentReviewed || item.volumeApproximate || !item.allergens?.trim() || item.availability === 'unconfirmed'))) {
+      throw new Error('Live launch blocked: confirm every revealed flavour’s price, volume, availability and allergen information.');
     }
   }
 }

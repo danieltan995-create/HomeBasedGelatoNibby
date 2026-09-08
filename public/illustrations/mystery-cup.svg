@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" fill="none" role="img" aria-labelledby="title description">
+  <title id="title">Mystery flavour — coming soon</title>
+  <desc id="description">An original grey lidded cup illustration with a large question mark. A sneak peek, not an available product or confirmed packaging.</desc>
+  <ellipse cx="242" cy="419" rx="128" ry="15" fill="#545454" opacity=".1"/>
+  <path d="M115 193L142 376C148 410 331 410 338 376L365 193Z" fill="#c5c5c2" stroke="#62625f" stroke-width="3"/>
+  <path d="M131 210L155 370C160 382 175 387 187 389L166 220Z" fill="#dededb"/>
+  <path d="M324 220L302 391C320 387 332 380 334 371L357 208Z" fill="#a6a6a2"/>
+  <ellipse cx="240" cy="193" rx="125" ry="35" fill="#e3e3df" stroke="#62625f" stroke-width="3"/>
+  <ellipse cx="240" cy="193" rx="106" ry="23" fill="#bababa"/>
+  <path d="M127 218C184 249 299 249 352 218M144 368C188 395 295 395 336 368" stroke="#777773" stroke-width="2"/>
+  <g transform="rotate(-8 240 127)">
+    <path d="M111 126V139C120 181 363 178 370 139V126" fill="#b8b8b4" stroke="#62625f" stroke-width="3"/>
+    <ellipse cx="240" cy="126" rx="130" ry="38" fill="#e9e9e6" stroke="#62625f" stroke-width="3"/>
+    <ellipse cx="240" cy="122" rx="110" ry="27" stroke="#a3a3a0" stroke-width="2"/>
+    <path d="M150 116C177 102 210 99 234 99" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <circle cx="240" cy="305" r="57" fill="#f1f1ee" stroke="#898985" stroke-width="1.5" stroke-dasharray="3 5"/>
+  <path d="M220 284C220 259 264 259 264 284C264 300 241 301 241 317" stroke="#555552" stroke-width="11" stroke-linecap="round"/>
+  <circle cx="241" cy="337" r="6" fill="#555552"/>
+  <g stroke="#858581" stroke-width="3" stroke-linecap="round">
+    <path d="M80 244V265M70 254H90M391 303V324M381 313H401M337 54V68M330 61H344"/>
+    <path d="M84 168L75 163M390 211L400 207"/>
+  </g>
+</svg>

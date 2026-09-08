@@ -2,10 +2,14 @@ import type { Flavour, OrderSelection } from './types';
 
 export const MAX_QUANTITY = 99; // A request UI limit, not an inventory claim.
 
+export function canSelectFlavour(flavour: Flavour | undefined): flavour is Flavour {
+  return flavour !== undefined && (flavour.availability === 'available' || flavour.availability === 'unconfirmed');
+}
+
 export function orderLines(selection: OrderSelection, menu: readonly Flavour[]) {
   return Object.entries(selection).map(([id, quantity]) => {
     const flavour = menu.find((item) => item.id === id);
-    if (!flavour || flavour.availability === 'sold-out') throw new Error('Flavour unavailable.');
+    if (!canSelectFlavour(flavour)) throw new Error('Flavour unavailable.');
     if (!Number.isSafeInteger(quantity) || quantity < 1 || quantity > MAX_QUANTITY) {
       throw new Error(`Choose a whole number from 1 to ${MAX_QUANTITY}.`);
     }
@@ -16,7 +20,7 @@ export function orderLines(selection: OrderSelection, menu: readonly Flavour[]) 
 export function setQuantity(selection: OrderSelection, menu: readonly Flavour[], id: string, quantity: number): OrderSelection {
   orderLines(selection, menu);
   const flavour = menu.find((item) => item.id === id);
-  if (!flavour || flavour.availability === 'sold-out') throw new Error('Flavour unavailable.');
+  if (!canSelectFlavour(flavour)) throw new Error('Flavour unavailable.');
   if (!Number.isSafeInteger(quantity) || quantity < 0 || quantity > MAX_QUANTITY) {
     throw new Error(`Choose a whole number from 0 to ${MAX_QUANTITY}.`);
   }

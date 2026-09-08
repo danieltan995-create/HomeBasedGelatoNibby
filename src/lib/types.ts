@@ -19,7 +19,7 @@ export interface Flavour {
   volumeMl: number;
   volumeApproximate: boolean;
   priceMinor: number | null;
-  availability: 'unconfirmed' | 'available' | 'sold-out';
+  availability: 'unconfirmed' | 'available' | 'sold-out' | 'coming-soon';
   details: string;
   allergens: string | null;
   contentReviewed: boolean;

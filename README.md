@@ -8,7 +8,7 @@
 
 This is a working **design preview**, not a live shop. It deliberately has no connected WhatsApp number, numeric prices, currency or promised delivery/pickup arrangement. Draft pages use `noindex, nofollow`, and the generated robots response disallows crawling. These are indexing hints, not access control; keep unpublished previews private if necessary.
 
-Initial menu: **Lemon Almond Nibs**, **Dark Chocolate**, **Pistachio My Love**. Planned serving size: approximately **140 ml**, in a lidded container. All artwork is original concept illustration, not photography or confirmed packaging.
+Initial lineup: **Lemon Almond Nibs** and **Dark Chocolate**, plus an unreleased flavour shown publicly as a grey **Mystery flavour** teaser. **Pistachio My Love** is retained in the source data for its later reveal, but has not been prepared or released and cannot be selected. No release date is promised. Planned serving size: approximately **140 ml**, in a lidded container. All artwork is original concept illustration, not photography or confirmed packaging.
 
 ## Local development
 
@@ -39,6 +39,12 @@ WhatsApp numbers must be 8–15 international digits only, with country code and
 
 Availability is owner-maintained, not real-time inventory. The limit of 99 cups per flavour is a request-interface limit, not a stock claim. A data/content change requires rebuilding and redeploying.
 
+### Reveal the upcoming flavour
+
+Pistachio currently has `availability: 'coming-soon'` in [src/data/flavours.ts](src/data/flavours.ts). That state automatically replaces its name, colour, artwork and image descriptions with a grey question-mark teaser in both the menu and hero. It displays “Coming soon” rather than a price or add button. Order selections, totals and WhatsApp messages reject it, even if a selection is manually tampered with.
+
+When it is ready, review the actual product details, allergens, volume and price, then set its availability to `available` (or `unconfirmed` only for a draft reveal). Its original name and artwork will return automatically. Update the upcoming-flavour assertions in [tests/flavour-presentation.test.ts](tests/flavour-presentation.test.ts), [tests/order.test.ts](tests/order.test.ts), [tests/whatsapp.test.ts](tests/whatsapp.test.ts) and [tests/storefront.spec.ts](tests/storefront.spec.ts), then rebuild and redeploy. Live launch still requires full review for every revealed product; a non-orderable teaser can remain upcoming. The teaser hides the identity in the storefront UI and metadata, not from people inspecting a public repository or its JavaScript/source assets.
+
 ### Connect social profiles
 
 The footer has a **Follow Nibby** section with locally bundled Instagram, REDnote (Xiaohongshu) and Facebook SVG logos. All three start as explicitly labelled placeholders, with no fake handles or platform-homepage links.
@@ -60,7 +66,7 @@ Copying uses the browser clipboard on secure origins (HTTPS or localhost). If pe
 The build rejects incomplete live configuration. Do not bypass validation just to remove the draft banner.
 
 - Check business name/trademark and domain availability; this project does not establish ownership.
-- Supply confirmed currency, all prices, exact serving volumes and availability statuses.
+- Supply confirmed currency, prices, exact serving volumes and availability statuses for all revealed flavours. Keep unreleased teasers marked `coming-soon` and unorderable.
 - Replace generic product detail copy with reviewed descriptions and complete allergen information, including relevant cross-contact advice. Do not infer dietary suitability from a flavour name.
 - Update the FAQ’s draft-specific serving/allergen/photography wording when details change.
 - Supply and manually verify the business WhatsApp number on mobile and desktop, without sending an automated message.

@@ -98,7 +98,7 @@ describe('WhatsApp URL construction', () => {
 
 describe('order request messages', () => {
   it('preserves every selected quantity and approximate cup size without confirming an order', () => {
-    const selection: OrderSelection = Object.freeze({ [lemonId]: 1, [chocolateId]: 99, [pistachioId]: 4 });
+    const selection: OrderSelection = Object.freeze({ [lemonId]: 1, [chocolateId]: 99 });
     const message = buildOrderMessage(selection, flavours, business);
     const lines = message.split('\n');
     const productLines = lines.filter((line) => /^\d+ × /.test(line));
@@ -107,8 +107,8 @@ describe('order request messages', () => {
     expect(message).toContain(business.area);
     expect(message).toMatch(/draft preview/i);
     expect(message).toMatch(/not an order/i);
-    expect(productLines).toHaveLength(3);
-    for (const flavour of flavours) {
+    expect(productLines).toHaveLength(2);
+    for (const flavour of flavours.filter(({ id }) => id in selection)) {
       const matching = productLines.filter((line) => line.startsWith(`${selection[flavour.id]} × ${flavour.name} (`));
       expect(matching).toHaveLength(1);
       expect(matching[0]).toMatch(/approx\.?\s+140\s*ml/i);
@@ -119,7 +119,8 @@ describe('order request messages', () => {
     expect(message).toMatch(/confirm availability, final price/i);
     expect(message).toMatch(/pickup\/delivery/i);
     expect(message).toMatch(/request, not a confirmed order/i);
-    expect(selection).toEqual({ [lemonId]: 1, [chocolateId]: 99, [pistachioId]: 4 });
+    expect(selection).toEqual({ [lemonId]: 1, [chocolateId]: 99 });
+    expect(message).not.toMatch(/pistachio|mystery/i);
   });
 
   it('omits unselected flavours', () => {
@@ -130,7 +131,7 @@ describe('order request messages', () => {
   });
 
   it('uses the configured names and area without losing special characters in the URL', () => {
-    const menu = flavours.map((flavour) => ({ ...flavour, name: `${flavour.name} — Crème 🍨 & + #1` }));
+    const menu = reviewedMenu().map((flavour) => ({ ...flavour, name: `${flavour.name} — Crème 🍨 & + #1` }));
     const config: BusinessConfig = { ...business, name: 'Nibby & Friends 🍦', area: 'Melaka + nearby #1' };
     const selection: OrderSelection = { [lemonId]: 2, [chocolateId]: 3, [pistachioId]: 99 };
     const message = buildOrderMessage(selection, menu, config);
@@ -192,6 +193,13 @@ describe('order request messages', () => {
     expect(() => buildOrderMessage({ 'not-on-menu': 1 }, flavours, business)).toThrow();
     const menu = reviewedMenu().map((flavour) => ({ ...flavour, availability: 'sold-out' as const }));
     expect(() => buildOrderMessage({ [lemonId]: 1 }, menu, liveBusiness)).toThrow();
+  });
+
+  it.each(['draft', 'live'] as const)('blocks coming-soon flavours in a forged %s selection', (mode) => {
+    const forgedSelections: OrderSelection[] = [{ [pistachioId]: 1 }, { [lemonId]: 1, [pistachioId]: 1 }];
+    for (const selection of forgedSelections) {
+      expect(() => buildOrderMessage(selection, flavours, { ...liveBusiness, mode })).toThrow(/unavailable/i);
+    }
   });
 });
 

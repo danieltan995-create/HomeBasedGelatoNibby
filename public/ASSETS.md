@@ -7,6 +7,7 @@ The Nibby illustrations in the table below are original concept art created for 
 | [Lemon Almond Nibs](illustrations/lemon-almond-nibs.svg) | 480 × 480, transparent | Muted lemon-yellow paper tub, hovering lid, gelato folds, lemon and almond doodles. |
 | [Dark Chocolate](illustrations/dark-chocolate.svg) | 480 × 480, transparent | Cocoa-brown paper tub with ivory lettering, hovering lid, chocolate folds and cocoa doodles. |
 | [Pistachio My Love](illustrations/pistachio-my-love.svg) | 480 × 480, transparent | Pistachio-green paper tub, hovering lid, gelato folds and pistachio doodles. |
+| [Mystery flavour](illustrations/mystery-cup.svg) | 480 × 480, transparent | Neutral grey lidded cup with an oversized question mark; used instead of the original artwork while a flavour is coming soon. No ingredient clues or release-date claims. |
 | [Favicon](favicon.svg) | 64 × 64 | Ivory lowercase n on green, with a small yellow sparkle. |
 | [Social card](social-card.svg) | 1200 × 630 | Cream-and-chocolate typography, proposed tagline and an abstract lidded gelato cup. |
 

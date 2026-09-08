@@ -6,9 +6,10 @@ import { test as base, expect, type Page } from '@playwright/test';
 const menu = [
   { id: 'lemon-almond-nibs', name: 'Lemon Almond Nibs', theme: 'lemon' },
   { id: 'dark-chocolate', name: 'Dark Chocolate', theme: 'cocoa' },
-  { id: 'pistachio-my-love', name: 'Pistachio My Love', theme: 'pistachio' },
+  { id: 'pistachio-my-love', name: 'Mystery flavour', theme: 'mystery' },
 ] as const;
-const [lemon, chocolate, pistachio] = menu;
+const [lemon, chocolate, mystery] = menu;
+const selectableMenu = [lemon, chocolate];
 type Flavour = (typeof menu)[number];
 type MessageLine = readonly [Flavour, number];
 
@@ -109,6 +110,7 @@ async function expectMessage(page: Page, lines: readonly MessageLine[]) {
   }
   const lineItems = (await message(page).inputValue()).match(/^\d+\s*×\s/gm) ?? [];
   expect(lineItems).toHaveLength(lines.length);
+  await expect(message(page)).not.toHaveValue(/pistachio|mystery/i);
 }
 
 async function expectNoWhatsAppDestination(page: Page) {
@@ -173,16 +175,52 @@ test('social logos are present with honest, non-interactive profile placeholders
   await expectSocialPlaceholders(page);
 });
 
+async function expectMysteryTeaser(page: Page) {
+  const teaser = card(page, mystery);
+  await expect(teaser).toHaveAttribute('data-availability', 'coming-soon');
+  await expect(teaser).toHaveClass(/theme-mystery/);
+  await expect(teaser.getByRole('heading', { name: 'Mystery flavour', exact: true })).toBeVisible();
+  await expect(teaser.locator('img')).toHaveAttribute('src', '/illustrations/mystery-cup.svg');
+  await expect(teaser.locator('img')).toHaveAttribute('alt', /grey.*question mark.*coming soon/i);
+  await expect(teaser.locator('.product-doodle')).toHaveText('?');
+  await expect(teaser.locator('.product-art')).toHaveCSS('background-color', 'rgb(228, 228, 224)');
+  await expect(teaser.getByText('Coming soon', { exact: true })).toBeVisible();
+  await expect(teaser.getByText('Not available to order yet', { exact: true })).toBeVisible();
+  await expect(teaser.locator('button, [data-add], .product-price, details')).toHaveCount(0);
+  await expect(page.locator('body')).not.toContainText(/pistachio/i);
+  await expect(page.locator('img[alt*="Pistachio"], img[src*="pistachio-my-love"]')).toHaveCount(0);
+  await expect(page.locator('meta[name="description"]')).not.toHaveAttribute('content', /pistachio/i);
+  await expect(page.locator('meta[property="og:description"]')).not.toHaveAttribute('content', /pistachio/i);
+}
+
+test('the grey mystery teaser stays unorderable even if an add control is tampered with', async ({ page }) => {
+  await visitStorefront(page);
+  await expectMysteryTeaser(page);
+  // Exercise the actual event handler, not just the absence of an add button.
+  const add = card(page, lemon).locator('[data-add]');
+  await add.evaluate((button, id) => { (button as HTMLElement).dataset.add = id; }, mystery.id);
+  await add.click();
+  await expectCount(page, 0);
+  await expect(page.locator('[data-toast]')).toContainText(/unavailable/i);
+  await add.evaluate((button, id) => { (button as HTMLElement).dataset.add = id; }, lemon.id);
+  await addCup(page, lemon);
+  await openOrder(page);
+  await expect(row(page, mystery)).toHaveCount(0);
+  await expectMessage(page, [[lemon, 1]]);
+  await expect(page.locator(`[data-add="${mystery.id}"]`)).toHaveCount(0);
+});
+
 test('native hero buttons support Enter and Space and update the image, pressed state and product highlight', async ({ page }) => {
   await visitStorefront(page);
   const picker = page.locator('.flavour-picker');
   const image = page.locator('[data-hero-image]');
   await expect(picker.getByRole('button')).toHaveCount(3);
-  await expect(picker.locator(`[data-spotlight="${pistachio.id}"]`)).toHaveAttribute('aria-pressed', 'true');
-  await expect(image).toHaveAttribute('src', `/illustrations/${pistachio.id}.svg`);
+  await expect(picker.locator(`[data-spotlight="${lemon.id}"]`)).toHaveAttribute('aria-pressed', 'true');
+  await expect(image).toHaveAttribute('src', `/illustrations/${lemon.id}.svg`);
 
-  for (const [flavour, key] of [[lemon, 'Enter'], [chocolate, 'Space'], [pistachio, 'Enter']] as const) {
-    const button = picker.getByRole('button', { name: `Preview ${flavour.name}`, exact: true });
+  for (const [flavour, key] of [[chocolate, 'Enter'], [mystery, 'Space'], [lemon, 'Enter']] as const) {
+    const comingSoon = flavour.id === mystery.id;
+    const button = picker.getByRole('button', { name: `Preview ${flavour.name}${comingSoon ? ' — coming soon' : ''}`, exact: true });
     await expect(button).toHaveJSProperty('tagName', 'BUTTON');
     await button.focus();
     await expect(button).toBeFocused();
@@ -191,17 +229,21 @@ test('native hero buttons support Enter and Space and update the image, pressed 
     await expect(button).toHaveAttribute('aria-pressed', 'true');
     await expect(picker.locator('[aria-pressed="true"]')).toHaveCount(1);
     await expect(picker.locator('[aria-pressed="false"]')).toHaveCount(2);
-    await expect(image).toHaveAttribute('src', `/illustrations/${flavour.id}.svg`);
+    await expect(image).toHaveAttribute('src', `/illustrations/${comingSoon ? 'mystery-cup' : flavour.id}.svg`);
     await expect(image).toHaveAttribute('alt', new RegExp(flavour.name));
     await expect.poll(() => image.evaluate((node) => {
       const img = node as HTMLImageElement;
       return img.complete && img.naturalWidth > 0;
     })).toBe(true);
-    await expect(page.locator('[data-hero-name]')).toHaveText(flavour.name);
+    await expect(page.locator('[data-hero-name]')).toHaveText(comingSoon ? 'Mystery flavour · coming soon' : flavour.name);
     await expect(page.locator('[data-hero-theme]')).toHaveAttribute('data-hero-theme', flavour.theme);
     await expect(page.locator('[data-card][data-featured]')).toHaveCount(1);
     await expect(card(page, flavour)).toHaveAttribute('data-featured', '');
     await expect(card(page, flavour).locator('.product-art')).not.toHaveCSS('outline-style', 'none');
+    if (comingSoon) {
+      await expectMysteryTeaser(page);
+      await expectCount(page, 0);
+    }
   }
 });
 
@@ -225,10 +267,10 @@ test('repeated adds produce one dialog row with quantity two and survive closing
 
 test('increment, decrement, removal and clear keep rows, counts and the draft message in sync', async ({ page }) => {
   await visitStorefront(page);
-  for (const flavour of menu) await addCup(page, flavour);
+  for (const flavour of selectableMenu) await addCup(page, flavour);
   await openOrder(page);
-  await expect(drawer(page).locator('[data-line]')).toHaveCount(3);
-  await expectMessage(page, [[lemon, 1], [chocolate, 1], [pistachio, 1]]);
+  await expect(drawer(page).locator('[data-line]')).toHaveCount(2);
+  await expectMessage(page, [[lemon, 1], [chocolate, 1]]);
   await expect(message(page)).toHaveValue(/prices?:[^\n]*confirm/i);
   await expect(message(page)).toHaveValue(/availability/i);
   await expect(message(page)).toHaveValue(/pickup\/delivery.*Melaka/i);
@@ -236,24 +278,24 @@ test('increment, decrement, removal and clear keep rows, counts and the draft me
 
   await row(page, lemon).getByRole('button', { name: `Increase ${lemon.name}`, exact: true }).click();
   await expect(row(page, lemon).getByRole('spinbutton')).toHaveValue('2');
-  await expectCount(page, 4);
-  await expectMessage(page, [[lemon, 2], [chocolate, 1], [pistachio, 1]]);
+  await expectCount(page, 3);
+  await expectMessage(page, [[lemon, 2], [chocolate, 1]]);
 
   await row(page, lemon).getByRole('button', { name: `Decrease ${lemon.name}`, exact: true }).click();
   await expect(row(page, lemon).getByRole('spinbutton')).toHaveValue('1');
-  await expectCount(page, 3);
-  await expectMessage(page, [[lemon, 1], [chocolate, 1], [pistachio, 1]]);
+  await expectCount(page, 2);
+  await expectMessage(page, [[lemon, 1], [chocolate, 1]]);
 
   await row(page, chocolate).getByRole('button', { name: `Remove ${chocolate.name}`, exact: true }).click();
   await expect(row(page, chocolate)).toHaveCount(0);
-  await expectCount(page, 2);
-  await expectMessage(page, [[lemon, 1], [pistachio, 1]]);
-
-  await row(page, pistachio).getByRole('button', { name: `Decrease ${pistachio.name}`, exact: true }).click();
-  await expect(row(page, pistachio)).toHaveCount(0);
   await expectCount(page, 1);
   await expectMessage(page, [[lemon, 1]]);
 
+  await row(page, lemon).getByRole('button', { name: `Decrease ${lemon.name}`, exact: true }).click();
+  await expectEmptyOrder(page);
+  await closeButton(page).click();
+  await addCup(page, chocolate);
+  await openOrder(page);
   await drawer(page).locator('[data-clear]').click();
   await expectEmptyOrder(page);
   await expect(drawer(page).locator('[data-drawer-status]')).toContainText(/clear/i);
@@ -349,9 +391,9 @@ test('clipboard rejection opens the preview and selects the entire fallback mess
     });
   });
   await visitStorefront(page);
-  await addCup(page, pistachio);
+  await addCup(page, chocolate);
   await openOrder(page);
-  await expectMessage(page, [[pistachio, 1]]);
+  await expectMessage(page, [[chocolate, 1]]);
   const preview = await message(page).inputValue();
   const details = drawer(page).locator('.message-details');
   await expect(details).toHaveJSProperty('open', true);
@@ -413,11 +455,12 @@ test('page and nonempty drawer have no horizontal overflow at 360, 390, 768 and 
         ), `No document overflow at ${width}px`).toBeLessThanOrEqual(1);
       };
       await expectPageFits();
-      for (const flavour of menu) await addCup(page, flavour);
+      for (const flavour of selectableMenu) await addCup(page, flavour);
+      await page.locator(`[data-spotlight="${mystery.id}"]`).click();
       await settleVisuals(page);
       await expectPageFits();
       await openOrder(page);
-      await expect(drawer(page).locator('[data-line]')).toHaveCount(3);
+      await expect(drawer(page).locator('[data-line]')).toHaveCount(2);
       await settleVisuals(page);
       await expectPageFits();
       for (const container of [drawer(page), drawer(page).locator('.drawer-scroll')]) {
@@ -435,17 +478,18 @@ test('axe finds no WCAG A/AA violations on the settled page and nonempty dialog'
   test.setTimeout(60_000);
   const tags = ['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'];
   await visitStorefront(page);
+  await page.locator(`[data-spotlight="${mystery.id}"]`).click();
   await settleVisuals(page);
   const pageScan = await new AxeBuilder({ page }).withTags(tags).analyze();
   expect.soft(pageScan.violations, 'Full-page WCAG scan').toEqual([]);
   const labelScan = await new AxeBuilder({ page }).withRules(['label-content-name-mismatch']).analyze();
   expect.soft(labelScan.violations, 'Accessible names include their visible labels').toEqual([]);
 
-  for (const flavour of menu) await addCup(page, flavour);
+  for (const flavour of selectableMenu) await addCup(page, flavour);
   await openOrder(page);
-  await expect(drawer(page).locator('[data-line]')).toHaveCount(3);
+  await expect(drawer(page).locator('[data-line]')).toHaveCount(2);
   await expect(drawer(page).locator('[data-order-summary]')).toBeVisible();
-  await expectMessage(page, [[lemon, 1], [chocolate, 1], [pistachio, 1]]);
+  await expectMessage(page, [[lemon, 1], [chocolate, 1]]);
   await settleVisuals(page);
   const dialogScan = await new AxeBuilder({ page }).include('#order-dialog').withTags(tags).analyze();
   expect.soft(dialogScan.violations, 'Nonempty dialog WCAG scan').toEqual([]);
@@ -460,7 +504,7 @@ test.describe('without site JavaScript', () => {
     await visitStorefront(page, false);
     await expect(page.locator('#flavours [data-card]')).toHaveCount(3);
     await expect(page.locator('#flavours [data-card] h3')).toHaveText(menu.map(({ name }) => name));
-    for (const flavour of menu) {
+    for (const flavour of selectableMenu) {
       await expect(card(page, flavour).getByRole('heading', { name: flavour.name, exact: true })).toBeVisible();
       await expect(card(page, flavour).getByRole('img', { name: new RegExp(flavour.name) })).toBeVisible();
       const details = card(page, flavour).locator('.product-details');
@@ -468,6 +512,7 @@ test.describe('without site JavaScript', () => {
       await expect(details).toHaveJSProperty('open', true);
       await expect(details.locator('div')).toBeVisible();
     }
+    await expectMysteryTeaser(page);
     // Native summary elements may expose button-like roles; they must remain usable.
     await expect(page.locator('button:visible')).toHaveCount(0);
     await expect(page.locator('[data-add]:visible, [data-open-order]:visible, [data-spotlight]:visible')).toHaveCount(0);

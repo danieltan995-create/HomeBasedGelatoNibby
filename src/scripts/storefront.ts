@@ -1,7 +1,8 @@
 import { business } from '../data/business';
 import { flavours } from '../data/flavours';
 import type { OrderSelection } from '../lib/types';
-import { calculateSubtotal, formatPrice, MAX_QUANTITY, orderLines, setQuantity, volumeLabel } from '../lib/order';
+import { calculateSubtotal, canSelectFlavour, formatPrice, MAX_QUANTITY, orderLines, setQuantity, volumeLabel } from '../lib/order';
+import { getFlavourPresentation } from '../lib/flavour-presentation';
 import { buildOrderMessage, buildWhatsAppUrl, canSendRequest } from '../lib/whatsapp';
 
 function required<T extends Element>(selector: string): T {
@@ -47,7 +48,7 @@ function initStorefront() {
     required<HTMLElement>('[data-order-summary]').hidden = count === 0;
     document.querySelectorAll<HTMLButtonElement>('[data-add]').forEach((button) => {
       const id = button.dataset.add!;
-      button.disabled = flavours.find((item) => item.id === id)?.availability === 'sold-out' || (selection[id] ?? 0) >= MAX_QUANTITY;
+      button.disabled = !canSelectFlavour(flavours.find((item) => item.id === id)) || (selection[id] ?? 0) >= MAX_QUANTITY;
     });
 
     const fragment = document.createDocumentFragment();
@@ -150,11 +151,12 @@ function initStorefront() {
     button.addEventListener('click', () => {
       const flavour = flavours.find((item) => item.id === button.dataset.spotlight);
       if (!flavour) return;
+      const preview = getFlavourPresentation(flavour);
       const image = required<HTMLImageElement>('[data-hero-image]');
-      image.src = flavour.illustration;
-      image.alt = `Concept illustration of a ${flavour.name} lidded cup`;
-      required<HTMLElement>('[data-hero-name]').textContent = flavour.name;
-      required<HTMLElement>('[data-hero-theme]').dataset.heroTheme = flavour.theme;
+      image.src = preview.illustration;
+      image.alt = preview.imageAlt;
+      required<HTMLElement>('[data-hero-name]').textContent = preview.heroLabel;
+      required<HTMLElement>('[data-hero-theme]').dataset.heroTheme = preview.theme;
       document.querySelectorAll('[data-spotlight]').forEach((node) => node.setAttribute('aria-pressed', String(node === button)));
       document.querySelectorAll<HTMLElement>('[data-card]').forEach((node) => {
         if (node.dataset.card === flavour.id) node.dataset.featured = '';
