@@ -1,0 +1,9 @@
+---
+import { flavours } from '../data/flavours';
+import FlavourCard from './FlavourCard.astro';
+---
+<section id="flavours" class="flavours-section wrap" aria-labelledby="flavour-heading">
+  <div class="section-intro"><div><p class="eyebrow">THE HARDEST PART? PICKING ONE.</p><h2 id="flavour-heading">Pick your little<br /><em>happiness.</em></h2></div><div class="section-aside"><p>Three personalities. One happy little cup.<br />Which one has your name on it?</p><span class="menu-note"><span aria-hidden="true">↙</span> Meet the starting lineup</span></div></div>
+  <div class="flavour-grid">{flavours.map((flavour, index) => <FlavourCard flavour={flavour} index={index} />)}</div>
+  <p class="menu-disclaimer">Illustrations are a preview, not actual product photos. Final prices, ingredients and availability are still being confirmed.</p>
+</section>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="icon-title icon-desc">
+  <title id="icon-title">Nibby lowercase n and sparkle</title>
+  <desc id="icon-desc">Original concept brand icon: an ivory lowercase n on a rounded deep-green square with a tiny yellow sparkle.</desc>
+  <rect width="64" height="64" rx="18" fill="#34472e"/>
+  <text x="29" y="48" text-anchor="middle" font-family="Georgia, serif" font-size="49" font-weight="700" fill="#fff6df">n</text>
+  <path d="m49 10 2.2 6.8L58 19l-6.8 2.2L49 28l-2.2-6.8L40 19l6.8-2.2Z" fill="#f3df87"/>
+</svg>

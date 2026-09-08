@@ -1,0 +1,44 @@
+---
+import '@fontsource/fraunces/latin-600.css';
+import '@fontsource/fraunces/latin-600-italic.css';
+import '@fontsource/dm-sans/latin-400.css';
+import '@fontsource/dm-sans/latin-500.css';
+import '@fontsource/dm-sans/latin-700.css';
+import '../styles/global.css';
+import { business } from '../data/business';
+import { flavours } from '../data/flavours';
+import { validateBusinessConfig } from '../lib/validation';
+validateBusinessConfig(business, flavours);
+const title = `${business.name} | Home-based gelato in ${business.area}`;
+const description = 'Little cups. Big happiness. Explore Lemon Almond Nibs, Dark Chocolate and Pistachio My Love from Nibby Gelato, a home-based gelato brand in Melaka.';
+const canonical = business.mode === 'live' && business.siteUrl ? new URL('/', business.siteUrl).href : null;
+---
+<!doctype html>
+<html lang="en-MY">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f8f5eb" />
+    <meta name="description" content={description} />
+    <meta name="robots" content={business.mode === 'draft' ? 'noindex, nofollow' : 'index, follow'} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {canonical && <>
+      <link rel="canonical" href={canonical} />
+      <meta property="og:url" content={canonical} />
+      <meta property="og:image" content={new URL('/social-card.png', canonical).href} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
+      <meta property="og:image:alt" content="Nibby Gelato. Little cups. Big happiness. Original illustrated cup." />
+      <meta name="twitter:card" content="summary_large_image" />
+    </>}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body id="home">
+    <a href="#main" class="skip-link">Skip to content</a>
+    <slot />
+    <script src="../scripts/storefront.ts"></script>
+  </body>
+</html>

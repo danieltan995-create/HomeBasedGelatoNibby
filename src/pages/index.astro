@@ -1,0 +1,42 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import Hero from '../components/Hero.astro';
+import FlavourExplorer from '../components/FlavourExplorer.astro';
+import OrderDrawer from '../components/OrderDrawer.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import Arrow from '../components/Arrow.astro';
+import { business } from '../data/business';
+import { canSendRequest } from '../lib/whatsapp';
+---
+<BaseLayout>
+  <SiteHeader />
+  <main id="main">
+    <Hero />
+    <FlavourExplorer />
+    <section id="our-story" class="story-section" aria-labelledby="story-heading">
+      <div class="story-inner wrap">
+        <div class="story-art" aria-hidden="true"><div class="story-stamp"><span>HELLO FROM</span><strong>Melaka</strong><svg viewBox="0 0 180 105" fill="none"><path d="M35 34c25-11 84-11 110 0l-11 57c-15 9-75 9-88 0L35 34Z" fill="#f6edcb" stroke="currentColor" stroke-width="2.5"/><ellipse cx="90" cy="34" rx="55" ry="14" fill="#e7c675" stroke="currentColor" stroke-width="2.5"/><path d="M71 62c5 9 11 9 17 0m12 0c5 9 11 9 17 0M86 78c7 7 12 7 18 0M25 13l-7-7m133 5 8-7M9 47l11 1m137-2 12-3" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg><span>WITH A SWEET LITTLE HELLO</span></div><span class="story-doodle">♡</span></div>
+        <div class="story-copy"><p class="eyebrow">SMALL BEGINNINGS. SWEET POSSIBILITIES.</p><h2 id="story-heading">A little local.<br />A lot to <em>love.</em></h2><p>Hi, we’re Nibby. A home-based gelato brand in Melaka, with a soft spot for life’s little sweet moments.</p><p>The after-lunch pause. The catch-up with a friend. The “you know what, why not?” treat. There’s always room for a little happiness.</p><a class="text-link" href="#how-to-order">Let’s find your happy cup <Arrow /></a></div>
+      </div>
+    </section>
+    <section id="how-to-order" class="how-section wrap" aria-labelledby="how-heading">
+      <div class="section-intro"><div><p class="eyebrow">FROM A LITTLE CRAVING TO YOUR CUP</p><h2 id="how-heading">Good things come<br />in <em>three little steps.</em></h2></div><p class="section-aside">No complicated checkout.<br />Just a little conversation.</p></div>
+      <ol class="steps"><li><span class="step-number">01</span><h3>Follow your sweet side.</h3><p>Explore the flavours and add your favourites to Your cups. One of each? We like your thinking.</p></li><li><span class="step-number">02</span><h3>Say hello on WhatsApp.</h3><p>Review your selection, then send a request through WhatsApp when ordering opens. You choose when to send.</p></li><li><span class="step-number">03</span><h3>We’ll work out the details.</h3><p>We’ll confirm availability, final pricing and fulfilment with you. Your order is only confirmed after we chat.</p></li></ol>
+      <p class="fulfilment-note"><span aria-hidden="true">↳</span> {business.fulfilment ?? 'For now, we’re in Melaka. Pickup, delivery and lead-time details are still being finalised.'}</p>
+    </section>
+    <section class="faq-section wrap" aria-labelledby="faq-heading">
+      <div><p class="eyebrow">A FEW LITTLE THINGS</p><h2 id="faq-heading">Glad you<br /><em>asked.</em><span aria-hidden="true">?</span></h2></div>
+      <div class="faq-list">
+        <details><summary>How big is a happy little cup?<span aria-hidden="true">+</span></summary><p>Our planned serving is approximately 140 ml in a container with a lid. Final serving size and packaging will be confirmed before launch.</p></details>
+        <details><summary>Can I order right now?<span aria-hidden="true">+</span></summary><p>{business.mode === 'draft' ? 'Not just yet! This is a design preview. You can explore flavours, build a selection and preview your message. Prices and our WhatsApp contact will be added before ordering opens.' : 'Build your selection and continue to WhatsApp to enquire. We will confirm availability, the final amount and fulfilment before accepting your order.'}</p></details>
+        <details><summary>Do you offer delivery or pickup?<span aria-hidden="true">+</span></summary><p>{business.fulfilment ?? 'We’re based in Melaka. Delivery areas, pickup arrangements, fees and lead times are still being decided. We won’t promise an option before it’s confirmed.'}</p></details>
+        <details><summary>What about ingredients and allergies?<span aria-hidden="true">+</span></summary><p>Full ingredient and allergen information is being confirmed. Please don’t assume any flavour is nut-free, dairy-free or suitable for a particular diet. Check the confirmed information with us before ordering if you have an allergy.</p></details>
+        <details><summary>Are these photos of your gelato?<span aria-hidden="true">+</span></summary><p>These are original illustrations to give you a feel for Nibby. They are not photos of our gelato or confirmed packaging. Real product photography will be added when it’s ready.</p></details>
+      </div>
+    </section>
+    <noscript><div class="noscript-note wrap"><p>Flavours and their details are available without JavaScript. Enable JavaScript to build a cup selection.</p>{canSendRequest(business) ? <a href={`https://wa.me/${business.whatsappNumber}`}>Enquire on WhatsApp</a> : <p>WhatsApp contact and ordering are coming soon.</p>}</div></noscript>
+  </main>
+  <SiteFooter />
+  <OrderDrawer />
+</BaseLayout>

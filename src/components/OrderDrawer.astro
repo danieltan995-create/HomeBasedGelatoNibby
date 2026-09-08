@@ -1,0 +1,25 @@
+---
+import { business } from '../data/business';
+import Arrow from './Arrow.astro';
+---
+<dialog class="order-drawer" id="order-dialog" aria-labelledby="order-title" aria-describedby="order-intro">
+  <div class="drawer-header"><span class="eyebrow">A LITTLE HAPPINESS TO GO</span><button class="icon-button" data-close-order aria-label="Close your cups" autofocus>×</button></div>
+  <h2 id="order-title">Your happy<br /><em>little cups.</em></h2>
+  <p id="order-intro">A wish list for now. Your request is only confirmed after we chat.</p>
+  <div class="drawer-scroll">
+    <div data-order-lines></div>
+    <div class="empty-order" data-empty-order><span aria-hidden="true">♡</span><h3>A little empty in here.</h3><p>Your next happy moment starts with a flavour.</p><button class="button" data-close-order>Explore the flavours <Arrow /></button></div>
+    <div data-order-summary hidden>
+      <div class="subtotal"><span>Product subtotal</span><strong data-subtotal>To be confirmed</strong></div>
+      <p class="order-fineprint">Final prices, availability and any fulfilment fees need confirmation. {business.fulfilment ?? 'Pickup and delivery details are coming soon.'}</p>
+      <details class="message-details" open><summary>Your message preview</summary><label class="sr-only" for="order-message">Order request message</label><textarea id="order-message" readonly rows="9" spellcheck="false"></textarea></details>
+      <p class="order-fineprint" id="send-help">{business.mode === 'draft' ? 'Draft preview: WhatsApp ordering is not connected yet. You can copy this preview, but it is not an order.' : 'Continue to WhatsApp to review and send your request. WhatsApp’s privacy terms apply. Nothing is sent automatically.'}</p>
+      <a class="button send-button" data-whatsapp hidden target="_blank" rel="noopener noreferrer" aria-describedby="send-help">Continue to WhatsApp <Arrow diagonal /></a>
+      <button class="button send-button" data-send-disabled disabled aria-describedby="send-help">WhatsApp coming soon <Arrow diagonal /></button>
+      <div class="drawer-secondary"><button class="text-button" data-copy>Copy message</button><button class="text-button" data-clear>Clear selection</button></div>
+    </div>
+    <p class="drawer-status" data-drawer-status role="status" aria-live="polite"></p>
+  </div>
+</dialog>
+<button class="button mobile-bag" data-mobile-bag data-open-order hidden aria-haspopup="dialog">Your cups <span class="bag-count" data-count>0</span><Arrow /></button>
+<div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true"></div>

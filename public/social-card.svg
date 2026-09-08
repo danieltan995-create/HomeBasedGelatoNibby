@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="social-title social-desc">
+  <title id="social-title">Nibby Gelato — Little cups. Big happiness.</title>
+  <desc id="social-desc">Original cream-and-chocolate social artwork with large Nibby Gelato lettering and the words Little cups. Big happiness. An abstract green paper gelato cup with a floating lemon-yellow lid sits on a hand-drawn chocolate-coloured oval. Brand and packaging concept art, not confirmed packaging or a product photograph.</desc>
+  <defs>
+    <linearGradient id="social-wrap" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#b3c783"/><stop offset=".3" stop-color="#d8e4b2"/><stop offset="1" stop-color="#c0d18f"/>
+    </linearGradient>
+    <linearGradient id="social-cap" x1="0" y1="0" x2=".2" y2="1">
+      <stop stop-color="#f8ebae"/><stop offset="1" stop-color="#f3df87"/>
+    </linearGradient>
+  </defs>
+  <path fill="#faf5e8" d="M0 0h1200v630H0Z"/>
+  <path d="M759 0H1200V630H854C955 551 1032 484 955 393S692 233 759 0Z" fill="#f0ead7"/>
+  <path d="M0 593C172 567 259 624 425 602S644 565 789 598 1036 625 1200 577V630H0Z" fill="#704432"/>
+  <g fill="#543526">
+    <text x="83" y="118" font-family="Arial, sans-serif" font-size="14" letter-spacing="5">A LITTLE CUP OF HAPPINESS</text>
+    <text x="77" y="264" font-family="Georgia, serif" font-size="114" font-weight="700" letter-spacing="-6">Nibby</text>
+    <text x="78" y="375" font-family="Georgia, serif" font-size="114" font-weight="700" letter-spacing="-6">Gelato</text>
+    <text x="85" y="452" font-family="Arial, sans-serif" font-size="29" letter-spacing="-.5">Little cups. Big happiness.</text>
+  </g>
+  <path d="M89 480Q254 492 403 477" fill="none" stroke="#a5b777" stroke-width="5" stroke-linecap="round"/>
+  <ellipse cx="911" cy="513" rx="182" ry="24" fill="#704432" opacity=".07"/>
+  <ellipse cx="913" cy="515" rx="161" ry="20" fill="none" stroke="#704432" stroke-width="2" stroke-opacity=".25" transform="rotate(-4 913 515)"/>
+  <g transform="rotate(7 909 346)">
+    <path d="M753 283Q909 252 1065 283L1042 460C1036 489 971 508 909 508S782 489 776 460Z" fill="url(#social-wrap)"/>
+    <path d="M777 335 791 453M790 467C848 497 972 498 1027 467" fill="none" stroke="#f6f5d7" stroke-width="3" stroke-opacity=".5" stroke-linecap="round"/>
+    <ellipse cx="909" cy="284" rx="156" ry="43" fill="#fff8e7"/>
+    <ellipse cx="909" cy="281" rx="145" ry="34" fill="#dbe3b6"/>
+    <path d="M783 287C818 262 845 307 892 288S966 261 1031 284M841 301C888 318 944 281 984 300" fill="none" stroke="#f6f5d9" stroke-width="7" stroke-linecap="round"/>
+    <g fill="#34472e" text-anchor="middle">
+      <text x="909" y="358" font-family="Arial, sans-serif" font-size="11" letter-spacing="5">G E L A T O</text>
+      <text x="906" y="423" font-family="Georgia, serif" font-size="91" font-weight="700" letter-spacing="-6">nibby</text>
+      <text x="909" y="458" font-family="Georgia, serif" font-size="19" font-style="italic">a little cup of happiness</text>
+    </g>
+  </g>
+  <g transform="rotate(-9 900 199)">
+    <path d="M736 198C736 220 809 238 900 238S1064 220 1064 198V211C1064 233 991 251 900 251S736 233 736 211Z" fill="#ddc97d"/>
+    <ellipse cx="900" cy="198" rx="164" ry="40" fill="url(#social-cap)"/>
+    <ellipse cx="900" cy="196" rx="151" ry="31" fill="none" stroke="#fff6d4" stroke-width="2"/>
+    <text x="900" y="211" text-anchor="middle" font-family="Georgia, serif" font-size="40" font-weight="700" letter-spacing="-2" fill="#704432">nibby</text>
+  </g>
+  <g fill="#704432">
+    <path d="m1082 114 5 17 17 5-17 5-5 17-5-17-17-5 17-5Z"/>
+    <path d="m705 364 3 10 10 3-10 3-3 10-3-10-10-3 10-3Z" opacity=".55"/>
+  </g>
+  <path d="M686 234Q665 210 681 199M1102 390Q1123 402 1116 423" fill="none" stroke="#9aa66c" stroke-width="3" stroke-linecap="round"/>
+</svg>

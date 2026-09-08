@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" role="img" aria-labelledby="lemon-title lemon-desc">
+  <title id="lemon-title">Nibby Gelato — Lemon Almond Nibs packaging concept</title>
+  <desc id="lemon-desc">Original vector concept, not a product photograph or confirmed packaging. A softly shaded, tapered 140 ml paper tub with a muted yellow wrap and playful nibby lettering. A tilted paper lid hovers above lemon gelato folds; a lemon wedge and almond sketches sit beside the cup. Transparent background.</desc>
+  <defs>
+    <linearGradient id="lemon-paper" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#704432" stop-opacity=".1"/><stop offset=".27" stop-color="#fffdf1" stop-opacity=".19"/><stop offset=".62" stop-color="#fffdf1" stop-opacity="0"/><stop offset="1" stop-color="#704432" stop-opacity=".13"/>
+    </linearGradient>
+    <linearGradient id="lemon-lid" x1="0" y1="0" x2=".25" y2="1">
+      <stop stop-color="#fffaf0"/><stop offset="1" stop-color="#f3df87"/>
+    </linearGradient>
+    <radialGradient id="lemon-scoop" cx=".35" cy=".28" r=".8">
+      <stop stop-color="#fff9d9"/><stop offset=".66" stop-color="#f4e5a8"/><stop offset="1" stop-color="#dfcb83"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="244" cy="427" rx="133" ry="12" fill="#443d27" opacity=".065"/>
+  <ellipse cx="243" cy="424" rx="97" ry="6" fill="#443d27" opacity=".035"/>
+  <path d="M92 204C92 181 388 181 388 204L366 377C362 399 305 415 240 415S118 399 114 377Z" fill="#f3df87"/>
+  <path d="M92 204C92 181 388 181 388 204L366 377C362 399 305 415 240 415S118 399 114 377Z" fill="url(#lemon-paper)"/>
+  <path d="M115 251L130 372" fill="none" stroke="#fff9db" stroke-width="3" stroke-linecap="round" opacity=".45"/>
+  <path d="M117 378C142 411 333 414 363 380" fill="none" stroke="#8e743c" stroke-opacity=".16" stroke-width="3"/>
+  <path d="M125 381C171 406 305 408 354 384" fill="none" stroke="#fff7d2" stroke-opacity=".55" stroke-width="2"/>
+  <ellipse cx="240" cy="204" rx="149" ry="43" fill="#fdf8e9" stroke="#c6b786" stroke-width="1.5"/>
+  <ellipse cx="240" cy="201" rx="139" ry="35" fill="url(#lemon-scoop)"/>
+  <g fill="none" stroke-linecap="round">
+    <path d="M113 203C143 179 183 222 223 208S292 176 348 199C365 205 365 215 352 219" stroke="#d8c585" stroke-width="4" opacity=".65"/>
+    <path d="M131 208C161 190 182 232 235 214S302 191 343 205" stroke="#fffbe2" stroke-width="7"/>
+    <path d="M175 227C223 240 262 208 298 215S322 226 310 229" stroke="#fff9d7" stroke-width="5"/>
+    <path d="M102 210C115 254 363 254 378 211" stroke="#fffdf4" stroke-width="3"/>
+  </g>
+  <g fill="#aa784a" opacity=".8">
+    <path d="m153 211 7-3 4 4-7 3Z"/><path d="m278 223 5-4 6 3-5 4Z"/><path d="m319 200 6-2 2 4-5 2Z"/>
+  </g>
+  <g fill="#543e29" text-anchor="middle">
+    <text x="240" y="260" font-family="Arial, sans-serif" font-size="9" letter-spacing="3.5">G E L A T O</text>
+    <text x="237" y="322" font-family="Georgia, serif" font-size="78" font-weight="700" letter-spacing="-5" transform="rotate(-3 237 297)">nibby</text>
+    <text x="240" y="350" font-family="Georgia, serif" font-size="18"><tspan x="240">lemon almond</tspan><tspan x="240" dy="20">nibs</tspan></text>
+    <text x="240" y="391" font-family="Arial, sans-serif" font-size="9" letter-spacing=".45">a little cup of happiness</text>
+    <text x="240" y="405" font-family="Arial, sans-serif" font-size="7" letter-spacing="1">140 ml</text>
+  </g>
+  <g transform="rotate(-6 240 145)">
+    <path d="M81 145C81 166 152 182 240 182S399 166 399 145V156C399 177 328 194 240 194S81 177 81 156Z" fill="#dfcc8a"/>
+    <ellipse cx="240" cy="145" rx="159" ry="37" fill="url(#lemon-lid)" stroke="#e1d4ae" stroke-width="1.5"/>
+    <ellipse cx="240" cy="143" rx="148" ry="29" fill="none" stroke="#fffdf2" stroke-width="2" opacity=".85"/>
+    <path d="M88 158C116 195 363 196 392 159" fill="none" stroke="#fff5d3" stroke-width="2" opacity=".7"/>
+    <text x="240" y="156" text-anchor="middle" fill="#705434" font-family="Georgia, serif" font-weight="700" font-size="36" letter-spacing="-2">nibby</text>
+    <path d="m330 139 3-7 3 7 8 2-8 2-3 7-3-7-8-2Z" fill="#bb984e" opacity=".65"/>
+  </g>
+  <g stroke="#90763e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M45 309Q65 277 83 301Q73 324 45 309Z" fill="#f3df87"/>
+    <path d="M51 307Q66 286 78 301L64 307ZM64 307 63 294M64 307 73 296" fill="none"/>
+    <path d="M397 348Q396 325 415 321Q425 345 397 348Z" fill="#e8cfaa"/>
+    <path d="M399 343Q409 335 411 326" fill="none"/>
+    <path d="M416 366Q411 347 429 341Q441 359 416 366Z" fill="#f2dfc2"/>
+    <path d="m419 361 8-15" fill="none"/>
+  </g>
+</svg>

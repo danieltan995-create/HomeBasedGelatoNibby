@@ -1,0 +1,27 @@
+---
+import { flavours } from '../data/flavours';
+import { business } from '../data/business';
+import Arrow from './Arrow.astro';
+const initial = flavours.find((item) => item.theme === 'pistachio')!;
+---
+<section class="hero wrap" aria-labelledby="hero-heading">
+  <div class="hero-copy">
+    <p class="eyebrow"><span class="tiny-spark" aria-hidden="true">✳</span> A HAPPY LITTLE GELATO BRAND · {business.area.toUpperCase()}</p>
+    <h1 id="hero-heading">Little cups.<br />Big <span class="hero-happiness">happiness.<svg viewBox="0 0 440 25" fill="none" aria-hidden="true"><path d="M5 15C112-2 268 2 430 10M54 23C182 12 273 14 355 20" stroke="currentColor" stroke-width="4" stroke-linecap="round" /></svg></span></h1>
+    <p class="hero-description">A little pick-me-up. A just-because treat.<br />Meet your next happy moment, one cup at a time.</p>
+    <div class="hero-actions"><a class="button" href="#flavours">Find your flavour <Arrow /></a><span class="hand-note">go on, take a peek <span aria-hidden="true">↗</span></span></div>
+    <div class="hero-footnote"><span class="little-cup" aria-hidden="true">♡</span><span>Home-based in {business.area}<span class="separator">·</span>Made for your sweet side</span></div>
+  </div>
+  <div class="hero-visual" data-hero-theme={initial.theme}>
+    <div class="hero-orbit" aria-hidden="true"></div>
+    <span class="hero-spark spark-one" aria-hidden="true">✳</span><span class="hero-spark spark-two" aria-hidden="true">✧</span>
+    <div class="round-sticker" aria-label="Approximately 140 millilitres per cup"><span>A LITTLE CUP OF</span><strong>oh, happy<br />days!</strong><span>APPROX. 140 ML</span></div>
+    <div class="hero-cup-wrap"><img data-hero-image class="hero-cup" src={initial.illustration} alt={`Concept illustration of a ${initial.name} lidded cup`} width="480" height="480" fetchpriority="high" /></div>
+    <div class="hero-flavour-label"><span class="label-line" aria-hidden="true"></span><span data-hero-name>{initial.name}</span><span aria-hidden="true">♡</span></div>
+    <div class="flavour-picker" data-enhance hidden aria-label="Preview a flavour">
+      {flavours.map((flavour) => <button class={`flavour-dot dot-${flavour.theme}`} data-spotlight={flavour.id} aria-label={`Preview ${flavour.name}`} aria-pressed={flavour.id === initial.id}><span aria-hidden="true"></span><span class="dot-label">{flavour.shortName}</span></button>)}
+    </div>
+    <p class="art-caption">A little imagination for now. Product & packaging illustrations.</p>
+  </div>
+</section>
+<div class="ribbon" aria-label="Home-based gelato, Melaka, three flavours to explore"><div class="ribbon-inner"><span>GOOD MOODS, BY THE CUP</span><span aria-hidden="true">✳</span><span>HELLO FROM {business.area.toUpperCase()}</span><span aria-hidden="true">✳</span><span>A LITTLE SPOONFUL OF JOY</span><span aria-hidden="true">✳</span><span>THREE FLAVOURS TO FALL FOR</span><span aria-hidden="true">✳</span></div></div>
