@@ -4,7 +4,10 @@ import Arrow from './Arrow.astro';
 import SocialLinks from './SocialLinks.astro';
 ---
 <footer class="site-footer">
-  <div class="footer-top wrap"><div><p class="eyebrow">SAVE ROOM FOR A LITTLE HAPPINESS.</p><h2>See you on the<br /><em>sweet side.</em> <span aria-hidden="true">✳</span></h2></div><div class="footer-contact"><p>Home-based in {business.area}.<br />For anyone with a sweet side.</p><a href="#flavours" class="button button-light">Meet the flavours <Arrow /></a><span>{business.mode === 'draft' ? 'WhatsApp contact coming soon' : 'Send your selection through Your cups'}</span></div></div>
+  <div class="footer-top wrap"><h2>See you on the <em>sweet side.</em></h2><div class="footer-contact"><p>Home-based in {business.area}.<br />For anyone with a sweet side.</p><a href="#flavours" class="button button-light">Meet the flavours <Arrow /></a><span>{business.mode === 'draft' ? 'WhatsApp contact coming soon' : 'Send your selection through Your cups'}</span></div></div>
   <SocialLinks />
-  <div class="footer-bottom wrap"><a class="footer-wordmark" href="#home" aria-label="Nibby Gelato home">nibby<span aria-hidden="true">✳</span></a><p>© {new Date().getFullYear()} {business.name}. A happy little gelato brand.</p><a class="back-top" href="#home">Back to top <span aria-hidden="true">↑</span></a></div>
+  <div class="footer-bottom wrap"><a class="footer-wordmark" href="#home" aria-label="Nibby Gelato home">nibby<span aria-hidden="true">✳</span></a><p>© {new Date().getFullYear()} {business.name}. A happy little gelato brand.</p></div>
 </footer>
+<a class="back-top" href="#home" aria-label="Back to top" title="Back to top">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+</a>

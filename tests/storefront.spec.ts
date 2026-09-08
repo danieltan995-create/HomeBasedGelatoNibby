@@ -175,6 +175,68 @@ test('social logos are present with honest, non-interactive profile placeholders
   await expectSocialPlaceholders(page);
 });
 
+test('floating Back to top works throughout the page and stays clear of the cart', async ({ page, isMobile }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await visitStorefront(page);
+  const backTop = page.locator('.back-top');
+  await expect(page.getByRole('link', { name: 'Back to top', exact: true })).toHaveCount(1);
+  await expect(backTop).toHaveAttribute('href', '#home');
+  await expect(backTop).toHaveCSS('position', 'fixed');
+  await expect(backTop).toBeInViewport();
+  await expect(backTop).toHaveCSS('transition-duration', '0s');
+
+  for (const section of ['#flavours', '#our-story', '.site-footer']) {
+    await page.locator(section).evaluate((node) => node.scrollIntoView({ behavior: 'instant' }));
+    await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(100);
+    await expect(backTop).toBeInViewport();
+    await backTop.click();
+    await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThanOrEqual(1);
+  }
+
+  await addCup(page, lemon);
+  await page.locator('.site-footer').evaluate((node) => node.scrollIntoView({ behavior: 'instant' }));
+  const arrowBox = await backTop.boundingBox();
+  expect(arrowBox!.width).toBeGreaterThanOrEqual(44);
+  expect(arrowBox!.height).toBeGreaterThanOrEqual(44);
+  if (isMobile) {
+    const bagBox = await page.locator('[data-mobile-bag]').boundingBox();
+    expect(bagBox!.x + bagBox!.width + 8).toBeLessThanOrEqual(arrowBox!.x);
+    const toastBox = await page.locator('[data-toast]').boundingBox();
+    expect(toastBox!.y + toastBox!.height).toBeLessThanOrEqual(arrowBox!.y);
+  }
+  // Enter keyboard modality, then focus the target explicitly: mobile WebKit
+  // does not necessarily include links in its default sequential Tab order.
+  await page.keyboard.press('Tab');
+  await backTop.focus();
+  await expect(backTop).toBeFocused();
+  await expect(backTop).toHaveCSS('outline-style', 'solid');
+  await page.keyboard.press('Enter');
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThanOrEqual(1);
+  await expectCount(page, 1);
+  await openOrder(page);
+  await expect(backTop).toBeHidden();
+  await closeButton(page).click();
+  await expect(backTop).toBeVisible();
+});
+
+test('the compact footer keeps social cards side by side without overflowing', async ({ page }) => {
+  await visitStorefront(page);
+  for (const width of [360, 390, 768, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await settleVisuals(page);
+    const footer = await page.locator('.site-footer').boundingBox();
+    expect(footer!.height, `Compact footer at ${width}px`).toBeLessThan(width <= 600 ? 540 : 400);
+    const cards = await page.locator('.social-card').all();
+    const boxes = await Promise.all(cards.map((card) => card.boundingBox()));
+    expect(boxes).toHaveLength(3);
+    for (const box of boxes) {
+      expect(Math.abs(box!.y - boxes[0]!.y)).toBeLessThanOrEqual(1);
+      expect(box!.x).toBeGreaterThanOrEqual(0);
+      expect(box!.x + box!.width).toBeLessThanOrEqual(width);
+    }
+  }
+});
+
 async function expectMysteryTeaser(page: Page) {
   const teaser = card(page, mystery);
   await expect(teaser).toHaveAttribute('data-availability', 'coming-soon');
@@ -531,5 +593,9 @@ test.describe('without site JavaScript', () => {
     await expect(faq).toHaveJSProperty('open', false);
     await expect(faq.locator('p')).toBeHidden();
     await expectSocialPlaceholders(page);
+    const backTop = page.getByRole('link', { name: 'Back to top', exact: true });
+    await expect(backTop).toBeInViewport();
+    await backTop.click();
+    await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThanOrEqual(1);
   });
 });
