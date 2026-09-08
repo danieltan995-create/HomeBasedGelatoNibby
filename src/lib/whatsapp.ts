@@ -23,5 +23,6 @@ export function buildWhatsAppUrl(number: string | null, message: string): string
 }
 
 export function canSendRequest(config: BusinessConfig): boolean {
-  return config.mode === 'live' && config.contactVerified && config.launchReviewed && isInternationalNumber(config.whatsappNumber);
+  if (!isInternationalNumber(config.whatsappNumber)) return false;
+  return config.mode === 'draft' || (config.contactVerified && config.launchReviewed);
 }

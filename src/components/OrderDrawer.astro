@@ -13,7 +13,7 @@ import Arrow from './Arrow.astro';
       <div class="subtotal"><span>Product subtotal</span><strong data-subtotal>To be confirmed</strong></div>
       <p class="order-fineprint">Final prices, availability and any fulfilment fees need confirmation. {business.fulfilment ?? 'Pickup and delivery details are coming soon.'}</p>
       <details class="message-details" open><summary>Your message preview</summary><label class="sr-only" for="order-message">Order request message</label><textarea id="order-message" readonly rows="9" spellcheck="false"></textarea></details>
-      <p class="order-fineprint" id="send-help">{business.mode === 'draft' ? 'Draft preview: WhatsApp ordering is not connected yet. You can copy this preview, but it is not an order.' : 'Continue to WhatsApp to review and send your request. WhatsApp’s privacy terms apply. Nothing is sent automatically.'}</p>
+      <p class="order-fineprint" id="send-help">{business.mode === 'draft' ? 'Test request: continue to WhatsApp to review and send this draft message. It is not a confirmed order.' : 'Continue to WhatsApp to review and send your request. WhatsApp’s privacy terms apply. Nothing is sent automatically.'}</p>
       <a class="button send-button" data-whatsapp hidden target="_blank" rel="noopener noreferrer" aria-describedby="send-help">Continue to WhatsApp <Arrow diagonal /></a>
       <button class="button send-button" data-send-disabled disabled aria-describedby="send-help">WhatsApp coming soon <Arrow diagonal /></button>
       <div class="drawer-secondary"><button class="text-button" data-copy>Copy message</button><button class="text-button" data-clear>Clear selection</button></div>

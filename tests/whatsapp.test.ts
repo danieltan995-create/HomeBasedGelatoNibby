@@ -204,12 +204,16 @@ describe('order request messages', () => {
 });
 
 describe('request sending gate', () => {
-  it('cannot send the initial draft', () => {
-    expect(canSendRequest(business)).toBe(false);
+  it('allows a configured draft to send a test request', () => {
+    expect(canSendRequest(business)).toBe(true);
   });
 
-  it('cannot send in draft mode even with a valid contact and both review flags set', () => {
-    expect(canSendRequest({ ...liveBusiness, mode: 'draft' })).toBe(false);
+  it('cannot send a draft without a WhatsApp number', () => {
+    expect(canSendRequest({ ...business, whatsappNumber: null })).toBe(false);
+  });
+
+  it('allows a draft test request with a valid contact', () => {
+    expect(canSendRequest({ ...liveBusiness, mode: 'draft' })).toBe(true);
   });
 
   it('allows a live, verified and fully reviewed fixture', () => {
