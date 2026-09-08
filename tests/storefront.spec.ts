@@ -152,6 +152,27 @@ test('the complete header stays visible while scrolling, keeping the selected cu
   await expect(row(page, lemon)).toBeVisible();
 });
 
+async function expectSocialPlaceholders(page: Page) {
+  const socials = page.getByRole('region', { name: 'Follow Nibby.' });
+  await socials.scrollIntoViewIfNeeded();
+  await expect(socials).toBeVisible();
+  await expect(socials.getByRole('listitem')).toHaveCount(3);
+  await expect(socials.locator('.social-name')).toHaveText(['Instagram', 'REDnote', 'Facebook']);
+  await expect(socials.getByText('Link coming soon', { exact: true })).toHaveCount(3);
+  await expect(socials.locator('[data-state="pending"]')).toHaveCount(3);
+  await expect(socials.locator('a, button, [tabindex]')).toHaveCount(0);
+  await expect(socials.locator('svg[aria-hidden="true"][focusable="false"] path')).toHaveCount(3);
+  for (const icon of await socials.locator('svg').all()) {
+    await expect(icon).toBeVisible();
+    expect(await icon.locator('path').getAttribute('d')).toMatch(/^M/);
+  }
+}
+
+test('social logos are present with honest, non-interactive profile placeholders', async ({ page }) => {
+  await visitStorefront(page);
+  await expectSocialPlaceholders(page);
+});
+
 test('native hero buttons support Enter and Space and update the image, pressed state and product highlight', async ({ page }) => {
   await visitStorefront(page);
   const picker = page.locator('.flavour-picker');
@@ -464,5 +485,6 @@ test.describe('without site JavaScript', () => {
     await faq.locator('summary').click();
     await expect(faq).toHaveJSProperty('open', false);
     await expect(faq.locator('p')).toBeHidden();
+    await expectSocialPlaceholders(page);
   });
 });

@@ -1,0 +1,69 @@
+---
+import { socialProfiles } from '../data/socials';
+import { getSocialProfileUrl } from '../lib/socials';
+import SocialIcon from './SocialIcon.astro';
+
+const profiles = socialProfiles.map((profile) => ({
+  ...profile,
+  url: getSocialProfileUrl(profile.id, profile.url),
+}));
+const allPending = profiles.every(({ url }) => url === null);
+---
+<section class="footer-social wrap" aria-labelledby="social-heading">
+  <div class="social-intro">
+    <p class="eyebrow">A LITTLE HAPPINESS, BEYOND THE CUP.</p>
+    <h2 id="social-heading">Follow <em>Nibby.</em></h2>
+    <p>{allPending ? 'Our social profile links are coming soon.' : 'Find our sweet side on your favourite feed.'}</p>
+  </div>
+  <ul class="social-list" role="list">
+    {profiles.map(({ id, name, url }) => {
+      const Tag = url ? 'a' : 'div';
+      return (
+        <li>
+          <Tag
+            class="social-card"
+            data-social={id}
+            data-state={url ? 'linked' : 'pending'}
+            href={url ?? undefined}
+            target={url ? '_blank' : undefined}
+            rel={url ? 'noopener noreferrer' : undefined}
+          >
+            <span class="social-badge"><SocialIcon platform={id} /></span>
+            <span class="social-copy">
+              <span class="social-name">{name}</span>
+              <span class="social-status">{url ? 'Visit profile' : 'Link coming soon'}</span>
+            </span>
+            {url && <><span class="social-arrow" aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></>}
+          </Tag>
+        </li>
+      );
+    })}
+  </ul>
+</section>
+
+<style>
+  .footer-social { border-top: 1px solid #ffffff24; padding-block: 32px; display: grid; grid-template-columns: .8fr 1.4fr; align-items: center; gap: 30px; }
+  .social-intro .eyebrow { font-size: 8px; color: #d2dbbf; margin-bottom: 10px; }
+  .social-intro h2 { font-size: 34px; letter-spacing: -1.3px; }
+  .social-intro > p:last-child { font-size: 11px; color: #dce3cf; margin: 12px 0 0; }
+  .social-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .social-card { display: flex; align-items: center; gap: 12px; height: 100%; min-height: 88px; padding: 14px 12px; border: 1px solid #ffffff38; border-radius: 10px; background: #ffffff08; }
+  a.social-card { transition: background 160ms, border-color 160ms; }
+  a.social-card:hover { background: #ffffff16; border-color: #d8e2b7; }
+  a.social-card:focus-visible { outline-color: #f0dc93; }
+  a.social-card:hover .social-name { text-decoration: underline; text-underline-offset: 4px; }
+  .social-badge { display: flex; flex: 0 0 46px; width: 46px; height: 46px; align-items: center; justify-content: center; border-radius: 12px; background: var(--cream); color: var(--green); }
+  .social-copy { min-width: 0; }
+  .social-name { display: block; font-size: 12px; font-weight: 700; }
+  .social-status { display: block; font-size: 9px; color: #dce3cf; margin-top: 3px; }
+  .social-arrow { margin-left: auto; font-size: 17px; }
+  @media (max-width: 1100px) {
+    .footer-social { grid-template-columns: 1fr; gap: 22px; }
+  }
+  @media (max-width: 600px) {
+    .social-list { grid-template-columns: 1fr; gap: 10px; }
+    .social-card { min-height: 76px; padding: 14px 16px; gap: 16px; }
+    .social-name { font-size: 13px; }
+    .social-status { font-size: 10px; }
+  }
+</style>

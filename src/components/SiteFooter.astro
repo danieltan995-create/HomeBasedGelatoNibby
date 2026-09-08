@@ -1,8 +1,10 @@
 ---
 import { business } from '../data/business';
 import Arrow from './Arrow.astro';
+import SocialLinks from './SocialLinks.astro';
 ---
 <footer class="site-footer">
   <div class="footer-top wrap"><div><p class="eyebrow">SAVE ROOM FOR A LITTLE HAPPINESS.</p><h2>See you on the<br /><em>sweet side.</em> <span aria-hidden="true">✳</span></h2></div><div class="footer-contact"><p>Home-based in {business.area}.<br />For anyone with a sweet side.</p><a href="#flavours" class="button button-light">Meet the flavours <Arrow /></a><span>{business.mode === 'draft' ? 'WhatsApp contact coming soon' : 'Send your selection through Your cups'}</span></div></div>
+  <SocialLinks />
   <div class="footer-bottom wrap"><a class="footer-wordmark" href="#home" aria-label="Nibby Gelato home">nibby<span aria-hidden="true">✳</span></a><p>© {new Date().getFullYear()} {business.name}. A happy little gelato brand.</p><a class="back-top" href="#home">Back to top <span aria-hidden="true">↑</span></a></div>
 </footer>

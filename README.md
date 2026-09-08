@@ -28,6 +28,7 @@ The Playwright suite starts its own production preview on port 4322 through Astr
 
 - [src/data/business.ts](src/data/business.ts): brand, service area, draft/live mode, currency, WhatsApp number, public site URL, fulfilment wording and review flags.
 - [src/data/flavours.ts](src/data/flavours.ts): exact product names, cup volume, illustration paths, prices, availability and confirmed ingredient/allergen text.
+- [src/data/socials.ts](src/data/socials.ts): Instagram, REDnote and Facebook profile URLs; `null` displays a non-clickable logo card marked “Link coming soon”.
 - [src/styles/global.css](src/styles/global.css): design tokens, layouts, typography and motion preferences.
 - [src/pages/index.astro](src/pages/index.astro): brand introduction, ordering guide and FAQ.
 - [src/components](src/components): reusable header, hero, product cards, order dialog and footer.
@@ -37,6 +38,14 @@ Use `null` for unknown prices/currency/contact; never enter dummy values. Prices
 WhatsApp numbers must be 8–15 international digits only, with country code and without `+`, punctuation or the local trunk zero. Format validation does **not** establish that the number exists or belongs to the business. Verify it manually before launch.
 
 Availability is owner-maintained, not real-time inventory. The limit of 99 cups per flavour is a request-interface limit, not a stock claim. A data/content change requires rebuilding and redeploying.
+
+### Connect social profiles
+
+The footer has a **Follow Nibby** section with locally bundled Instagram, REDnote (Xiaohongshu) and Facebook SVG logos. All three start as explicitly labelled placeholders, with no fake handles or platform-homepage links.
+
+In [src/data/socials.ts](src/data/socials.ts), replace each `url: null` with the full HTTPS URL of the business profile after checking it belongs to you. Use a direct Instagram profile, a REDnote/Xiaohongshu user-profile URL, or a Facebook page/profile URL (including `profile.php?id=…` if needed), rather than an app share short-link. The build rejects malformed URLs, other domains and non-HTTPS schemes. Validation does not verify account ownership or existence.
+
+Configured profiles become accessible links that open in a new tab with `noopener noreferrer`; unconfigured platforms remain placeholders. Social links work without JavaScript and are independent of draft/live ordering mode. There are no social embeds, SDKs, tracking pixels or third-party icon requests. Rebuild and redeploy after editing the URLs. Before changing placeholders to real links, update the placeholder assertions in [tests/socials.test.ts](tests/socials.test.ts) and [tests/storefront.spec.ts](tests/storefront.spec.ts) to reflect the configured profiles; never navigate to real accounts in automated tests.
 
 ## How ordering works
 
