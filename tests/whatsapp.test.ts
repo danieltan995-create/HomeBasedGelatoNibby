@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { business } from '../src/data/business';
 import { flavours } from '../src/data/flavours';
-import type { BusinessConfig, Flavour, OrderSelection } from '../src/lib/types';
+import type { BusinessConfig, Flavour, OrderRequestDetails, OrderSelection } from '../src/lib/types';
 import { isInternationalNumber, validateBusinessConfig } from '../src/lib/validation';
-import { buildOrderMessage, buildWhatsAppUrl, canSendRequest } from '../src/lib/whatsapp';
+import { buildOrderMessage, buildWhatsAppUrl, canSendRequest, validateOrderRequestDetails } from '../src/lib/whatsapp';
+import { buildAuditPayload, createRequestId } from '../src/lib/order-audit';
 
 // Reserved fictional NANP number. These tests inspect strings only; no network requests.
 const testNumber = '12025550100';
@@ -97,7 +98,7 @@ describe('WhatsApp URL construction', () => {
 });
 
 describe('order request messages', () => {
-  it('preserves every selected quantity and approximate cup size without confirming an order', () => {
+  it('preserves every selected quantity without adding packaging details', () => {
     const selection: OrderSelection = Object.freeze({ [lemonId]: 1, [chocolateId]: 99 });
     const message = buildOrderMessage(selection, flavours, business);
     const lines = message.split('\n');
@@ -109,10 +110,8 @@ describe('order request messages', () => {
     expect(message).toMatch(/not an order/i);
     expect(productLines).toHaveLength(2);
     for (const flavour of flavours.filter(({ id }) => id in selection)) {
-      const matching = productLines.filter((line) => line.startsWith(`${selection[flavour.id]} × ${flavour.name} (`));
+      const matching = productLines.filter((line) => line === `${selection[flavour.id]} × *${flavour.name}*`);
       expect(matching).toHaveLength(1);
-      expect(matching[0]).toMatch(/approx\.?\s+140\s*ml/i);
-      expect(matching[0]).toMatch(/lidded cup/i);
     }
     expect(message).toMatch(/prices.*awaiting confirmation/i);
     expect(message).not.toMatch(/product subtotal/i);
@@ -125,7 +124,7 @@ describe('order request messages', () => {
 
   it('omits unselected flavours', () => {
     const message = buildOrderMessage({ [chocolateId]: 2 }, flavours, business);
-    expect(message).toContain('2 × Dark Chocolate');
+    expect(message).toContain('2 × *Dark Chocolate*');
     expect(message).not.toContain('Lemon Almond Nibs');
     expect(message).not.toContain('Pistachio My Love');
   });
@@ -141,7 +140,7 @@ describe('order request messages', () => {
     expect(message).toContain(config.name);
     expect(message).toContain(config.area);
     for (const flavour of menu) {
-      expect(message).toContain(`${selection[flavour.id]} × ${flavour.name}`);
+      expect(message).toContain(`${selection[flavour.id]} × *${flavour.name}*`);
     }
   });
 
@@ -156,8 +155,51 @@ describe('order request messages', () => {
     expect(message).toMatch(/excludes.*fulfilment fees/i);
     expect(message).toMatch(/confirm availability, final price/i);
     expect(message).toMatch(/request, not a confirmed order/i);
-    expect(message).not.toMatch(/draft preview|approx\.?/i);
-    expect(message).toContain('140 ml');
+    expect(message).not.toMatch(/draft preview|approx\.?|140\s*ml|lidded cup/i);
+  });
+
+  it('includes customer and fulfilment details without confirming the order', () => {
+    const details: OrderRequestDetails = {
+      customerName: ' Aina ',
+      preferredDate: '2026-09-12',
+      preferredTime: '15:30',
+      fulfilment: 'delivery',
+      deliveryArea: 'Ayer Keroh',
+      paymentMethod: 'qr_transfer',
+    };
+    const message = buildOrderMessage({ [lemonId]: 2 }, flavours, business, details);
+
+    expect(message).toContain('Name: Aina');
+    expect(message).toContain('Preferred date: 2026-09-12');
+    expect(message).toContain('Preferred time: 15:30');
+    expect(message).toContain('Fulfilment: Delivery to Ayer Keroh');
+    expect(message).toContain('Payment method: QR Transfer');
+    expect(message).toMatch(/request, not a confirmed order/i);
+    expect(message).not.toMatch(/140\s*ml|lidded cup/i);
+  });
+
+  it('protects the request reference used for tracking', () => {
+    const message = buildOrderMessage({ [lemonId]: 1 }, flavours, business, {
+      customerName: 'Aina',
+      preferredDate: '2026-09-12',
+      preferredTime: '15:30',
+      fulfilment: 'pickup',
+      deliveryArea: '',
+      paymentMethod: 'cod',
+    }, 'NIB-20260908-AB12');
+
+    expect(message).toContain('Request reference: *NIB-20260908-AB12*');
+    expect(message).toMatch(/do not delete or change the Request reference/i);
+    expect(message).toMatch(/required for order tracking/i);
+  });
+
+  it.each([
+    [{ customerName: '', preferredDate: '2026-09-12', preferredTime: '15:30', fulfilment: 'pickup', deliveryArea: '', paymentMethod: 'cod' }, 'name'],
+    [{ customerName: 'Aina', preferredDate: '', preferredTime: '15:30', fulfilment: 'pickup', deliveryArea: '', paymentMethod: 'cod' }, 'date'],
+    [{ customerName: 'Aina', preferredDate: '2026-09-12', preferredTime: '', fulfilment: 'pickup', deliveryArea: '', paymentMethod: 'cod' }, 'time'],
+    [{ customerName: 'Aina', preferredDate: '2026-09-12', preferredTime: '15:30', fulfilment: 'delivery', deliveryArea: '', paymentMethod: 'cod' }, 'delivery area'],
+  ] as const)('requires %s', (details, field) => {
+    expect(validateOrderRequestDetails(details)).toMatch(new RegExp(field, 'i'));
   });
 
   it('does not publish a partial subtotal for a mixture of known and unknown prices', () => {
@@ -227,5 +269,36 @@ describe('request sending gate', () => {
 
   it.each(invalidNumbers)('blocks a live request with invalid contact %j', (whatsappNumber) => {
     expect(canSendRequest({ ...liveBusiness, whatsappNumber })).toBe(false);
+  });
+});
+
+describe('Google Sheets audit payloads', () => {
+  const details: OrderRequestDetails = {
+    customerName: 'Aina',
+    preferredDate: '2026-09-12',
+    preferredTime: '15:30',
+    fulfilment: 'delivery',
+    deliveryArea: 'Ayer Keroh',
+    paymentMethod: 'qr_transfer',
+  };
+
+  it('creates a readable request reference', () => {
+    expect(createRequestId(new Date('2026-09-08T10:00:00Z'), 0)).toBe('NIB-20260908-0000');
+    expect(createRequestId(new Date('2026-09-08T10:00:00Z'), 0.99999)).toMatch(/^NIB-20260908-[A-Z0-9]{4}$/);
+  });
+
+  it('builds an audit payload from the same order selection', () => {
+    const payload = buildAuditPayload('NIB-20260908-AB12', { [lemonId]: 2 }, flavours, details, null);
+    expect(payload).toMatchObject({
+      requestId: 'NIB-20260908-AB12',
+      customerName: 'Aina',
+      fulfilment: 'delivery',
+      deliveryArea: 'Ayer Keroh',
+      paymentMethod: 'qr_transfer',
+      subtotal: null,
+      currency: null,
+    });
+    expect(payload.items).toEqual([{ name: 'Lemon Almond Nibs', quantity: 2 }]);
+    expect(payload.createdAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
   });
 });

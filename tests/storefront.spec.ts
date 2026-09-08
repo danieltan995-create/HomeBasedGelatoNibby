@@ -99,9 +99,7 @@ async function expectEmptyOrder(page: Page) {
 async function expectMessage(page: Page, lines: readonly MessageLine[]) {
   for (const [flavour, quantity] of lines) {
     // Exact menu names/quantities are a contract; surrounding marketing copy is not.
-    await expect(message(page)).toHaveValue(new RegExp(
-      `(?:^|\\n)${quantity}\\s*×\\s*${flavour.name}\\s*\\([^\\n]*140\\s*ml[^\\n]*\\)`, 'i',
-    ));
+    await expect(message(page)).toHaveValue(new RegExp(`(?:^|\\n)${quantity}\\s*×\\s*\\*?${flavour.name}\\*?(?:\\n|$)`, 'i'));
   }
   for (const flavour of menu) {
     if (!lines.some(([selected]) => selected.id === flavour.id)) {
@@ -138,6 +136,28 @@ test('draft metadata and exact menu names are present without an outbound orderi
   await expect(message(page)).toHaveValue(/draft/i);
   await expect(message(page)).toHaveValue(/not an order/i);
   await expectNoWhatsAppDestination(page);
+});
+
+test('collects request details before enabling the WhatsApp order link', async ({ page }) => {
+  await visitStorefront(page);
+  await addCup(page, lemon);
+  await openOrder(page);
+
+  const details = drawer(page).locator('[data-request-details]');
+  await details.locator('[data-request-field="customerName"]').fill('Aina');
+  await details.locator('[data-request-field="preferredDate"]').fill('2026-09-12');
+  await details.locator('[data-request-field="preferredTime"]').fill('15:30');
+  await details.locator('[data-request-field="fulfilment"]').selectOption('delivery');
+  await expect(details.locator('[data-delivery-area]')).toBeVisible();
+  await details.locator('[data-request-field="deliveryArea"]').fill('Ayer Keroh');
+
+  const sendLink = drawer(page).locator('[data-whatsapp]');
+  await expect(sendLink).toBeVisible();
+  await expect(sendLink).toHaveAttribute('href', /https:\/\/wa\.me\/60172688120\?text=/);
+  await expect(message(page)).toHaveValue(/Name: Aina/);
+  await expect(message(page)).toHaveValue(/Preferred date: 2026-09-12/);
+  await expect(message(page)).toHaveValue(/Fulfilment: Delivery to Ayer Keroh/);
+  await expect(message(page)).not.toHaveValue(/140\\s*ml|lidded cup/i);
 });
 
 test('the complete header stays visible while scrolling, keeping the selected cups reachable', async ({ page }) => {

@@ -12,10 +12,26 @@ import Arrow from './Arrow.astro';
     <div data-order-summary hidden>
       <div class="subtotal"><span>Product subtotal</span><strong data-subtotal>To be confirmed</strong></div>
       <p class="order-fineprint">Final prices, availability and any fulfilment fees need confirmation. {business.fulfilment ?? 'Pickup and delivery details are coming soon.'}</p>
+      <fieldset class="request-details" data-request-details>
+        <legend>Details for confirmation</legend>
+        <label for="customer-name">Your name</label>
+        <input id="customer-name" data-request-field="customerName" type="text" autocomplete="name" required maxlength="80" />
+        <div class="request-fields-row">
+          <div><label for="preferred-date">Preferred date</label><input id="preferred-date" data-request-field="preferredDate" type="date" required /></div>
+          <div><label for="preferred-time">Preferred time</label><input id="preferred-time" data-request-field="preferredTime" type="time" required /></div>
+        </div>
+        <label for="fulfilment-choice">Pickup or delivery</label>
+        <select id="fulfilment-choice" data-request-field="fulfilment" required><option value="pickup">Pickup</option><option value="delivery">Delivery</option></select>
+        <div data-delivery-area hidden><label for="delivery-area">Delivery area</label><input id="delivery-area" data-request-field="deliveryArea" type="text" autocomplete="address-level2" maxlength="120" placeholder="Area or neighbourhood" /></div>
+        <label for="payment-method">Payment method</label>
+        <select id="payment-method" data-request-field="paymentMethod" required><option value="cod">COD</option><option value="qr_transfer">QR Transfer</option></select>
+        <p class="request-details-help">Your details stay in this page until you choose to send the request in WhatsApp.</p>
+        <p class="request-details-error" data-request-details-error role="status" aria-live="polite"></p>
+      </fieldset>
       <details class="message-details" open><summary>Your message preview</summary><label class="sr-only" for="order-message">Order request message</label><textarea id="order-message" readonly rows="9" spellcheck="false"></textarea></details>
       <p class="order-fineprint" id="send-help">{business.mode === 'draft' ? 'Test request: continue to WhatsApp to review and send this draft message. It is not a confirmed order.' : 'Continue to WhatsApp to review and send your request. WhatsApp’s privacy terms apply. Nothing is sent automatically.'}</p>
       <a class="button send-button" data-whatsapp hidden target="_blank" rel="noopener noreferrer" aria-describedby="send-help">Continue to WhatsApp <Arrow diagonal /></a>
-      <button class="button send-button" data-send-disabled disabled aria-describedby="send-help">WhatsApp coming soon <Arrow diagonal /></button>
+      <button class="button send-button" data-send-disabled disabled aria-describedby="send-help">Complete details to continue <Arrow diagonal /></button>
       <div class="drawer-secondary"><button class="text-button" data-copy>Copy message</button><button class="text-button" data-clear>Clear selection</button></div>
     </div>
     <p class="drawer-status" data-drawer-status role="status" aria-live="polite"></p>

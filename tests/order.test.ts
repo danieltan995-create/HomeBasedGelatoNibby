@@ -53,7 +53,7 @@ describe('initial data and flavour validation', () => {
     expect(business).toMatchObject({
       mode: 'draft',
       currency: null,
-      whatsappNumber: null,
+      whatsappNumber: '60172688120',
       siteUrl: null,
       fulfilment: null,
       contactVerified: false,

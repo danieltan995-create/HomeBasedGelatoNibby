@@ -1,9 +1,10 @@
 import { business } from '../data/business';
 import { flavours } from '../data/flavours';
-import type { OrderSelection } from '../lib/types';
+import type { OrderRequestDetails, OrderSelection } from '../lib/types';
 import { calculateSubtotal, canSelectFlavour, formatPrice, MAX_QUANTITY, orderLines, setQuantity, volumeLabel } from '../lib/order';
 import { getFlavourPresentation } from '../lib/flavour-presentation';
-import { buildOrderMessage, buildWhatsAppUrl, canSendRequest } from '../lib/whatsapp';
+import { buildOrderMessage, buildWhatsAppUrl, canSendRequest, validateOrderRequestDetails } from '../lib/whatsapp';
+import { buildAuditPayload, createRequestId, sendAudit } from '../lib/order-audit';
 
 function required<T extends Element>(selector: string): T {
   const node = document.querySelector<T>(selector);
@@ -26,9 +27,31 @@ function initStorefront() {
   const status = required<HTMLElement>('[data-drawer-status]');
   const sendLink = required<HTMLAnchorElement>('[data-whatsapp]');
   const disabledSend = required<HTMLButtonElement>('[data-send-disabled]');
+  const detailsError = required<HTMLElement>('[data-request-details-error]');
+  const deliveryArea = required<HTMLElement>('[data-delivery-area]');
+  const detailFields = Array.from(document.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-request-field]'));
   let selection: OrderSelection = {};
   let opener: HTMLElement | null = null;
   let toastTimer: ReturnType<typeof setTimeout>;
+
+  function requestDetails(): OrderRequestDetails {
+    const value = (field: string) => required<HTMLInputElement | HTMLSelectElement>(`[data-request-field="${field}"]`).value;
+    return {
+      customerName: value('customerName'),
+      preferredDate: value('preferredDate'),
+      preferredTime: value('preferredTime'),
+      fulfilment: value('fulfilment') as OrderRequestDetails['fulfilment'],
+      deliveryArea: value('deliveryArea'),
+      paymentMethod: value('paymentMethod') as OrderRequestDetails['paymentMethod'],
+    };
+  }
+
+  function clearRequestDetails() {
+    detailFields.forEach((field) => {
+      if (field.dataset.requestField === 'fulfilment') field.value = 'pickup';
+      else field.value = '';
+    });
+  }
 
   const announce = (text: string) => {
     toast.textContent = text;
@@ -93,8 +116,13 @@ function initStorefront() {
     lineContainer.replaceChildren(fragment);
     const subtotal = calculateSubtotal(selection, flavours, business.currency);
     required<HTMLElement>('[data-subtotal]').textContent = subtotal === null ? 'To be confirmed' : formatPrice(subtotal, business.currency);
-    messageField.value = count ? buildOrderMessage(selection, flavours, business) : '';
-    const url = count && canSendRequest(business) ? buildWhatsAppUrl(business.whatsappNumber, messageField.value) : null;
+    const details = requestDetails();
+    const requestError = validateOrderRequestDetails(details);
+    deliveryArea.hidden = details.fulfilment !== 'delivery';
+    required<HTMLInputElement>('[data-request-field="deliveryArea"]').required = details.fulfilment === 'delivery';
+    detailsError.textContent = count && requestError ? requestError : '';
+    messageField.value = count ? buildOrderMessage(selection, flavours, business, requestError ? undefined : details) : '';
+    const url = count && !requestError && canSendRequest(business) ? buildWhatsAppUrl(business.whatsappNumber, messageField.value) : null;
     sendLink.hidden = !url;
     disabledSend.hidden = !!url;
     if (url) sendLink.href = url;
@@ -127,6 +155,24 @@ function initStorefront() {
       document.body.classList.add('dialog-open');
     });
   });
+  sendLink.addEventListener('click', (event) => {
+    if (!sendLink.href) return;
+    const details = requestDetails();
+    const requestError = validateOrderRequestDetails(details);
+    if (!selection || requestError || !canSendRequest(business)) return;
+    event.preventDefault();
+    const requestId = createRequestId();
+    const message = buildOrderMessage(selection, flavours, business, details, requestId);
+    const url = buildWhatsAppUrl(business.whatsappNumber, message);
+    if (!url) return;
+    const payload = buildAuditPayload(requestId, selection, flavours, details, business.currency);
+    window.open(url, '_blank', 'noopener,noreferrer');
+    void sendAudit(payload, business.auditWebhookUrl).then((logged) => {
+      status.textContent = logged
+        ? `Request ${requestId} prepared and added to tracking. Confirm it in WhatsApp.`
+        : `Request ${requestId} prepared. WhatsApp opened, but tracking could not be saved.`;
+    });
+  });
   document.querySelectorAll<HTMLButtonElement>('[data-close-order]').forEach((button) => button.addEventListener('click', () => dialog.close()));
   dialog.addEventListener('close', () => {
     document.body.classList.remove('dialog-open');
@@ -146,6 +192,9 @@ function initStorefront() {
       }
     });
   });
+
+  detailFields.forEach((field) => field.addEventListener('input', render));
+  detailFields.forEach((field) => field.addEventListener('change', render));
 
   document.querySelectorAll<HTMLButtonElement>('[data-spotlight]').forEach((button) => {
     button.addEventListener('click', () => {
@@ -167,6 +216,7 @@ function initStorefront() {
 
   required<HTMLButtonElement>('[data-clear]').addEventListener('click', () => {
     selection = {};
+    clearRequestDetails();
     render();
     status.textContent = 'Your selection has been cleared.';
     required<HTMLButtonElement>('[data-close-order]').focus();
