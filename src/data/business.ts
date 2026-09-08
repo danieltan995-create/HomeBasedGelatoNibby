@@ -6,7 +6,7 @@ export const business: BusinessConfig = {
   name: 'Nibby Gelato',
   area: 'Melaka',
   currency: null,
-  whatsappNumber: null, // International digits only, without +, spaces or a local leading zero.
+  whatsappNumber: '60172688120', // International digits only, without +, spaces or a local leading zero.
   siteUrl: null,
   fulfilment: null,
   contactVerified: false,
