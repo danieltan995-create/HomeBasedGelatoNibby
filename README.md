@@ -2,6 +2,8 @@
 
 **Nibby Gelato** — a playful, illustrated, mobile-first storefront for a home-based gelato business in Melaka.
 
+[![Open the Nibby Gelato website](https://raw.githubusercontent.com/danieltan995-create/HomeBasedGelatoNibby/main/public/social-card.png)](https://danieltan995-create.github.io/HomeBasedGelatoNibby/)
+
 ## Current status
 
 This is a working **design preview**, not a live shop. It deliberately has no connected WhatsApp number, numeric prices, currency or promised delivery/pickup arrangement. Draft pages use `noindex, nofollow`, and the generated robots response disallows crawling. These are indexing hints, not access control; keep unpublished previews private if necessary.
