@@ -2,13 +2,15 @@ import type { Flavour } from '../lib/types';
 
 // Prices use integer minor units (e.g. 1250 means 12.50 for MYR), never floating point.
 // null means unknown, NOT free. Keep unverified dietary claims out of the menu.
+const assetPath = (fileName: string) => `${import.meta.env.BASE_URL.replace(/\/$/, '')}/illustrations/${fileName}`;
+
 export const flavours: Flavour[] = [
   {
     id: 'lemon-almond-nibs',
     name: 'Lemon Almond Nibs',
     shortName: 'Lemon',
     theme: 'lemon',
-    illustration: '/illustrations/lemon-almond-nibs.svg',
+    illustration: assetPath('lemon-almond-nibs.svg'),
     volumeMl: 140,
     volumeApproximate: true,
     priceMinor: null,
@@ -22,7 +24,7 @@ export const flavours: Flavour[] = [
     name: 'Dark Chocolate',
     shortName: 'Chocolate',
     theme: 'cocoa',
-    illustration: '/illustrations/dark-chocolate.svg',
+    illustration: assetPath('dark-chocolate.svg'),
     volumeMl: 140,
     volumeApproximate: true,
     priceMinor: null,
@@ -36,7 +38,7 @@ export const flavours: Flavour[] = [
     name: 'Pistachio My Love',
     shortName: 'Pistachio',
     theme: 'pistachio',
-    illustration: '/illustrations/pistachio-my-love.svg',
+    illustration: assetPath('pistachio-my-love.svg'),
     volumeMl: 140,
     volumeApproximate: true,
     priceMinor: null,

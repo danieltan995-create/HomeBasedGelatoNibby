@@ -65,6 +65,14 @@ The site exports ordinary static assets; no server adapter, API, credentials or 
 
 Check the chosen provider’s current commercial-use terms, limits and costs before using a free plan. Do not publish until the launch checklist is complete. No deployment, domain purchase or Git push is performed by this project setup.
 
+### Temporary GitHub Pages preview
+
+This repository includes [.github/workflows/deploy.yml](.github/workflows/deploy.yml). Once it is committed and pushed to `main`, the workflow builds and deploys the static site to **https://danieltan995-create.github.io/HomeBasedGelatoNibby/**.
+
+Before the first deployment, open the repository on GitHub, select **Settings** → **Pages**, and choose **GitHub Actions** as the publishing source. Thereafter, every push to `main` deploys; use **Actions** → **Deploy to GitHub Pages** → **Run workflow** to deploy the existing `main` branch manually. Watch that workflow for the published URL and failures.
+
+The Astro configuration automatically uses `/HomeBasedGelatoNibby/` only inside GitHub Actions; local preview continues to use `/`. Do not change `base` merely to test locally. GitHub Pages is publicly reachable even when a repository is private on plans that permit private Pages, so do not place private details in the preview. The draft site remains `noindex`, but that does not make the URL private.
+
 ## Artwork and fonts
 
 See [public/ASSETS.md](public/ASSETS.md) for original artwork notes. Replace concept images with your own licensed product photos when ready, preserve their layout dimensions, and update alt text and illustration disclaimers accordingly. Photography and packaging claims must match the actual products.

@@ -12,6 +12,7 @@ validateBusinessConfig(business, flavours);
 const title = `${business.name} | Home-based gelato in ${business.area}`;
 const description = 'Little cups. Big happiness. Explore Lemon Almond Nibs, Dark Chocolate and Pistachio My Love from Nibby Gelato, a home-based gelato brand in Melaka.';
 const canonical = business.mode === 'live' && business.siteUrl ? new URL('/', business.siteUrl).href : null;
+const assetPath = (fileName: string) => `${import.meta.env.BASE_URL.replace(/\/$/, '')}/${fileName}`;
 ---
 <!doctype html>
 <html lang="en-MY">
@@ -33,7 +34,7 @@ const canonical = business.mode === 'live' && business.siteUrl ? new URL('/', bu
       <meta property="og:image:alt" content="Nibby Gelato. Little cups. Big happiness. Original illustrated cup." />
       <meta name="twitter:card" content="summary_large_image" />
     </>}
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href={assetPath('favicon.svg')} />
     <title>{title}</title>
   </head>
   <body id="home">
