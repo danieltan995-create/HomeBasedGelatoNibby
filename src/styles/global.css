@@ -222,6 +222,13 @@ body.dialog-open .back-top, body:has(dialog[open]) .back-top { display: none; }
 .empty-order p { font-size: 12px; color: var(--muted); margin-bottom: 25px; }
 .subtotal { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 20px; display: flex; justify-content: space-between; gap: 10px; font-size: 12px; }
 .order-fineprint { color: var(--muted); font-size: 11px; margin-block: 13px 19px; }
+.request-details { border: 0; padding: 0; margin: 20px 0 14px; }
+.request-details legend { font-size: 12px; font-weight: 700; margin-bottom: 12px; }
+.request-details label { display: block; color: var(--muted); font-size: 10px; margin: 10px 0 5px; }
+.request-details input, .request-details select { width: 100%; min-height: 38px; border: 1px solid var(--line); border-radius: 4px; padding: 8px 10px; background: #fffdf6; color: var(--ink); font: inherit; font-size: 12px; }
+.request-fields-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.request-details-help, .request-details-error { color: var(--muted); font-size: 10px; margin: 10px 0 0; }
+.request-details-error { color: #9b3d2e; min-height: 15px; }
 .message-details { font-size: 12px; margin-bottom: 14px; }
 .message-details summary { text-decoration: underline; text-underline-offset: 4px; padding-block: 12px; }
 #order-message { display: block; width: 100%; resize: vertical; border: 1px solid var(--line); border-radius: 4px; padding: 12px; background: #fffdf6; color: var(--ink); font-size: 11px; line-height: 1.65; }
