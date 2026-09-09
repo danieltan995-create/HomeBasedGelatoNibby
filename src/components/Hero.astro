@@ -4,24 +4,25 @@ import { business } from '../data/business';
 import { canSelectFlavour } from '../lib/order';
 import { getFlavourPresentation } from '../lib/flavour-presentation';
 import Arrow from './Arrow.astro';
+import Doodle from './Doodle.astro';
 const initial = flavours.find(canSelectFlavour) ?? flavours[0];
 const preview = getFlavourPresentation(initial);
 const hasUpcoming = flavours.some((flavour) => flavour.availability === 'coming-soon');
 ---
 <section class="hero wrap" aria-labelledby="hero-heading">
   <div class="hero-copy">
-    <p class="eyebrow"><span class="tiny-spark" aria-hidden="true">✳</span> A HAPPY LITTLE GELATO BRAND · {business.area.toUpperCase()}</p>
+    <p class="eyebrow"><span class="tiny-spark" aria-hidden="true"><Doodle /></span> A HAPPY LITTLE GELATO BRAND · {business.area.toUpperCase()}</p>
     <h1 id="hero-heading">Little cups.<br />Big <span class="hero-happiness">happiness.<svg viewBox="0 0 440 25" fill="none" aria-hidden="true"><path d="M5 15C112-2 268 2 430 10M54 23C182 12 273 14 355 20" stroke="currentColor" stroke-width="4" stroke-linecap="round" /></svg></span></h1>
     <p class="hero-description">A little pick-me-up. A just-because treat.<br />Meet your next happy moment, one cup at a time.</p>
-    <div class="hero-actions"><a class="button" href="#flavours">Find your flavour <Arrow /></a><span class="hand-note">go on, take a peek <span aria-hidden="true">↗</span></span></div>
-    <div class="hero-footnote"><span class="little-cup" aria-hidden="true">♡</span><span>Home-based in {business.area}<span class="separator">·</span>Made for your sweet side</span></div>
+    <div class="hero-actions"><a class="button" href="#flavours">Find your flavour <Arrow /></a><span class="hand-note">go on, take a peek <span aria-hidden="true"><Arrow diagonal /></span></span></div>
+    <div class="hero-footnote"><span class="little-cup" aria-hidden="true"><Doodle kind="heart" /></span><span>Home-based in {business.area}<span class="separator">·</span>Made for your sweet side</span></div>
   </div>
   <div class="hero-visual" data-hero-theme={preview.theme}>
     <div class="hero-orbit" aria-hidden="true"></div>
-    <span class="hero-spark spark-one" aria-hidden="true">✳</span><span class="hero-spark spark-two" aria-hidden="true">✧</span>
+    <span class="hero-spark spark-one" aria-hidden="true"><Doodle /></span><span class="hero-spark spark-two" aria-hidden="true"><Doodle kind="sparkle" /></span>
     <div class="round-sticker" aria-label="Approximately 140 millilitres per cup"><span>A LITTLE CUP OF</span><strong>oh, happy<br />days!</strong><span>APPROX. 140 ML</span></div>
     <div class="hero-cup-wrap"><img data-hero-image class="hero-cup" src={preview.illustration} alt={preview.imageAlt} width="480" height="480" fetchpriority="high" /></div>
-    <div class="hero-flavour-label"><span class="label-line" aria-hidden="true"></span><span data-hero-name>{preview.heroLabel}</span><span aria-hidden="true">♡</span></div>
+    <div class="hero-flavour-label"><span class="label-line" aria-hidden="true"></span><span data-hero-name>{preview.heroLabel}</span><span aria-hidden="true"><Doodle kind="heart" /></span></div>
     <div class="flavour-picker" data-enhance hidden aria-label="Preview a flavour">
       {flavours.map((flavour) => {
         const item = getFlavourPresentation(flavour);
@@ -31,4 +32,4 @@ const hasUpcoming = flavours.some((flavour) => flavour.availability === 'coming-
     <p class="art-caption">A little imagination for now. Product & packaging illustrations.</p>
   </div>
 </section>
-<div class="ribbon" aria-label={`Home-based gelato, ${business.area}${hasUpcoming ? ', a mystery flavour coming soon' : ''}`}><div class="ribbon-inner"><span>GOOD MOODS, BY THE CUP</span><span aria-hidden="true">✳</span><span>HELLO FROM {business.area.toUpperCase()}</span><span aria-hidden="true">✳</span><span>A LITTLE SPOONFUL OF JOY</span><span aria-hidden="true">✳</span><span>{hasUpcoming ? 'A LITTLE MYSTERY, COMING SOON' : 'FIND YOUR NEXT HAPPY FLAVOUR'}</span><span aria-hidden="true">✳</span></div></div>
+<div class="ribbon" aria-label={`Home-based gelato, ${business.area}${hasUpcoming ? ', a mystery flavour coming soon' : ''}`}><div class="ribbon-inner"><span>GOOD MOODS, BY THE CUP</span><span aria-hidden="true"><Doodle /></span><span>HELLO FROM {business.area.toUpperCase()}</span><span aria-hidden="true"><Doodle /></span><span>A LITTLE SPOONFUL OF JOY</span><span aria-hidden="true"><Doodle /></span><span>{hasUpcoming ? 'A LITTLE MYSTERY, COMING SOON' : 'FIND YOUR NEXT HAPPY FLAVOUR'}</span><span aria-hidden="true"><Doodle /></span></div></div>

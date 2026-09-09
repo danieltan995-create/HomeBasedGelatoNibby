@@ -1,11 +1,12 @@
 ---
 import { business } from '../data/business';
 import Arrow from './Arrow.astro';
+import Doodle from './Doodle.astro';
 ---
 <div class="header-shell">
   {business.mode === 'draft' && <div class="preview-bar"><span class="preview-dot" aria-hidden="true"></span> A little taste of what’s coming. <span class="preview-extra">Design preview · prices & ordering coming soon</span><span class="preview-mobile">Draft preview</span></div>}
   <header class="site-header wrap">
-    <a class="wordmark" href="#home">nibby<span class="wordmark-star" aria-hidden="true">✳</span><span class="wordmark-caption">GELATO</span><span class="sr-only"> home</span></a>
+    <a class="wordmark" href="#home">nibby<span class="wordmark-star" aria-hidden="true"><Doodle /></span><span class="wordmark-caption">GELATO</span><span class="sr-only"> home</span></a>
     <nav aria-label="Main navigation">
       <a href="#flavours">Our flavours</a>
       <a href="#our-story">A little about us</a>

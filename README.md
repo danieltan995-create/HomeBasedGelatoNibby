@@ -28,7 +28,7 @@ The Playwright suite starts its own production preview on port 4322 through Astr
 
 - [src/data/business.ts](src/data/business.ts): brand, service area, draft/live mode, currency, WhatsApp number, public site URL, fulfilment wording and review flags.
 - [src/data/flavours.ts](src/data/flavours.ts): exact product names, cup volume, illustration paths, prices, availability and confirmed ingredient/allergen text.
-- [src/data/socials.ts](src/data/socials.ts): Instagram, REDnote and Facebook profile URLs; `null` displays a non-clickable logo card marked “Link coming soon”.
+- [src/data/socials.ts](src/data/socials.ts): Instagram, REDnote and Facebook profile URLs; `null` displays a noticeboard card marked “Link coming soon”, opening only a local note.
 - [src/styles/global.css](src/styles/global.css): design tokens, layouts, typography and motion preferences.
 - [src/pages/index.astro](src/pages/index.astro): brand introduction, ordering guide and FAQ.
 - [src/components](src/components): reusable header, hero, product cards, order dialog and footer.
@@ -45,13 +45,21 @@ Pistachio currently has `availability: 'coming-soon'` in [src/data/flavours.ts](
 
 When it is ready, review the actual product details, allergens, volume and price, then set its availability to `available` (or `unconfirmed` only for a draft reveal). Its original name and artwork will return automatically. Update the upcoming-flavour assertions in [tests/flavour-presentation.test.ts](tests/flavour-presentation.test.ts), [tests/order.test.ts](tests/order.test.ts), [tests/whatsapp.test.ts](tests/whatsapp.test.ts) and [tests/storefront.spec.ts](tests/storefront.spec.ts), then rebuild and redeploy. Live launch still requires full review for every revealed product; a non-orderable teaser can remain upcoming. The teaser hides the identity in the storefront UI and metadata, not from people inspecting a public repository or its JavaScript/source assets.
 
+### Interactive flavour cards
+
+Tap/click a revealed cup to flip the artwork into flavour notes; tap “Back to cup” to return. Enter/Space toggle the focused control, and Escape returns to the illustration. Desktop hover only hints at the interaction, so it never interrupts reading. Names, prices and Add a cup stay outside the flipping area. The mystery teaser remains static and unorderable.
+
+Reduced-motion mode swaps faces instantly. Without JavaScript, the original native “A closer look” disclosure remains available. Flavour descriptions/allergen notes share one component, [src/components/FlavourNotes.astro](src/components/FlavourNotes.astro), so both presentations stay in sync. Decorative stars, suns and hearts use inline SVG in [src/components/Doodle.astro](src/components/Doodle.astro), avoiding iOS emoji substitution.
+
 ### Connect social profiles
 
-The footer has a **Follow Nibby** section with locally bundled Instagram, REDnote (Xiaohongshu) and Facebook SVG logos. All three start as explicitly labelled placeholders, with no fake handles or platform-homepage links.
+The footer’s **Nibby noticeboard / Follow Nibby** section has locally bundled Instagram, REDnote (Xiaohongshu) and Facebook SVG logos. Pastel cards open native notes on tap/click or keyboard activation, including without JavaScript. All three start as explicitly labelled placeholders, with no fake handles or platform-homepage links.
 
 In [src/data/socials.ts](src/data/socials.ts), replace each `url: null` with the full HTTPS URL of the business profile after checking it belongs to you. Use a direct Instagram profile, a REDnote/Xiaohongshu user-profile URL, or a Facebook page/profile URL (including `profile.php?id=…` if needed), rather than an app share short-link. The build rejects malformed URLs, other domains and non-HTTPS schemes. Validation does not verify account ownership or existence.
 
-Configured profiles become accessible links that open in a new tab with `noopener noreferrer`; unconfigured platforms remain placeholders. Social links work without JavaScript and are independent of draft/live ordering mode. There are no social embeds, SDKs, tracking pixels or third-party icon requests. Rebuild and redeploy after editing the URLs. Before changing placeholders to real links, update the placeholder assertions in [tests/socials.test.ts](tests/socials.test.ts) and [tests/storefront.spec.ts](tests/storefront.spec.ts) to reflect the configured profiles; never navigate to real accounts in automated tests.
+Configured profiles show accessible links inside their cards that open in a new tab with `noopener noreferrer`; unconfigured platforms open only a local coming-soon note. Social links work without JavaScript and are independent of draft/live ordering mode. There are no social embeds, SDKs, tracking pixels or third-party icon requests. Rebuild and redeploy after editing the URLs. Before changing placeholders to real links, update the placeholder assertions in [tests/socials.test.ts](tests/socials.test.ts) and [tests/storefront.spec.ts](tests/storefront.spec.ts) to reflect the configured profiles; never navigate to real accounts in automated tests.
+
+Design references: [Partake Foods](https://partakefoods.com/) for playful food branding and a dedicated community moment; [Salt & Straw](https://saltandstraw.com/) for bold flavour-led storytelling. Nibby’s artwork, layout and interactions are original; no competitor assets or code are used.
 
 ## How ordering works
 

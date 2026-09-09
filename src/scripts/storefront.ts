@@ -5,6 +5,7 @@ import { calculateSubtotal, canSelectFlavour, formatPrice, MAX_QUANTITY, orderLi
 import { getFlavourPresentation } from '../lib/flavour-presentation';
 import { buildOrderMessage, buildWhatsAppUrl, canSendRequest, validateOrderRequestDetails } from '../lib/whatsapp';
 import { buildAuditPayload, createRequestId, sendAudit } from '../lib/order-audit';
+import { initFlavourCards } from './flavour-cards';
 
 function required<T extends Element>(selector: string): T {
   const node = document.querySelector<T>(selector);
@@ -238,4 +239,5 @@ function initStorefront() {
   document.querySelectorAll<HTMLElement>('[data-enhance]').forEach((node) => { node.hidden = false; });
 }
 
+initFlavourCards();
 initStorefront();

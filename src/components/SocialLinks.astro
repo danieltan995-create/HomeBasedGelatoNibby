@@ -2,6 +2,13 @@
 import { socialProfiles } from '../data/socials';
 import { getSocialProfileUrl } from '../lib/socials';
 import SocialIcon from './SocialIcon.astro';
+import Arrow from './Arrow.astro';
+
+const notes = {
+  instagram: { title: 'Little happy moments', text: 'A future home for cup close-ups and little Nibby moments. Our Instagram link will appear here when it’s ready.' },
+  rednote: { title: 'Our sweet little diary', text: 'A little space for Nibby discoveries on REDnote. Our profile link is still being prepared — check back for a sweet hello.' },
+  facebook: { title: 'Hello, neighbours', text: 'Our future neighbourhood corner for Nibby news. The Facebook profile link will be added here once it’s confirmed.' },
+};
 
 const profiles = socialProfiles.map((profile) => ({
   ...profile,
@@ -11,59 +18,76 @@ const allPending = profiles.every(({ url }) => url === null);
 ---
 <section class="footer-social wrap" aria-labelledby="social-heading">
   <div class="social-intro">
+    <p class="social-kicker">THE NIBBY NOTICEBOARD</p>
     <h2 id="social-heading">Follow <em>Nibby.</em></h2>
-    <p>{allPending ? 'Our social profile links are coming soon.' : 'Find our sweet side on your favourite feed.'}</p>
+    <p>More than a cup. A little connection.<br />{allPending ? 'Profile links coming soon. Peek below.' : 'Open a card. Find your favourite feed.'}</p>
   </div>
   <ul class="social-list" role="list">
-    {profiles.map(({ id, name, url }) => {
-      const Tag = url ? 'a' : 'div';
-      return (
+    {profiles.map(({ id, name, url }) => (
         <li>
-          <Tag
-            class="social-card"
-            data-social={id}
-            data-state={url ? 'linked' : 'pending'}
-            href={url ?? undefined}
-            target={url ? '_blank' : undefined}
-            rel={url ? 'noopener noreferrer' : undefined}
-          >
-            <span class="social-badge"><SocialIcon platform={id} /></span>
-            <span class="social-copy">
+          <details class="social-card" data-social={id} data-state={url ? 'linked' : 'pending'}>
+            <summary>
+              <span class="social-topline"><span class="social-badge"><SocialIcon platform={id} /></span><span class="social-peek" aria-hidden="true">+</span></span>
               <span class="social-name">{name}</span>
-              <span class="social-status">{url ? 'Visit profile' : 'Link coming soon'}</span>
-            </span>
-            {url && <><span class="social-arrow" aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></>}
-          </Tag>
+              <span class="social-caption">{notes[id].title}</span>
+              <span class="social-status">{url ? 'Open for profile' : 'Link coming soon'}</span>
+            </summary>
+            <div class="social-note">
+              {url ? <a href={url} target="_blank" rel="noopener noreferrer">Visit {name} <Arrow diagonal /><span class="sr-only"> (opens in a new tab)</span></a> : <p>{notes[id].text}</p>}
+            </div>
+          </details>
         </li>
-      );
-    })}
+    ))}
   </ul>
 </section>
 
 <style>
-  .footer-social { border-top: 1px solid #ffffff24; padding-block: 20px; display: grid; grid-template-columns: .8fr 1.4fr; align-items: center; gap: 24px; }
-  .social-intro h2 { font-size: 27px; letter-spacing: -1px; }
-  .social-intro > p:last-child { font-size: 11px; color: #dce3cf; margin: 6px 0 0; }
-  .social-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-  .social-card { display: flex; align-items: center; gap: 10px; height: 100%; min-height: 68px; padding: 10px; border: 1px solid #ffffff38; border-radius: 10px; background: #ffffff08; }
-  a.social-card { transition: background 160ms, border-color 160ms; }
-  a.social-card:hover { background: #ffffff16; border-color: #d8e2b7; }
-  a.social-card:focus-visible { outline-color: #f0dc93; }
-  a.social-card:hover .social-name { text-decoration: underline; text-underline-offset: 4px; }
-  .social-badge { display: flex; flex: 0 0 36px; width: 36px; height: 36px; align-items: center; justify-content: center; border-radius: 9px; background: var(--cream); color: var(--green); }
-  .social-badge :global(svg) { width: 24px; height: 24px; }
-  .social-copy { min-width: 0; }
-  .social-name { display: block; font-size: 12px; font-weight: 700; }
-  .social-status { display: block; font-size: 9px; color: #dce3cf; margin-top: 3px; }
-  .social-arrow { margin-left: auto; font-size: 17px; }
-  @media (max-width: 1100px) {
-    .footer-social { grid-template-columns: 1fr; gap: 14px; }
+  .footer-social { border-top: 1px solid #ffffff24; padding-block: 22px; display: grid; grid-template-columns: .8fr 1.4fr; align-items: center; gap: 30px; }
+  .social-kicker { color: #d8e2b7; font-size: 8px; font-weight: 700; letter-spacing: 1.8px; margin: 0 0 9px; }
+  .social-intro h2 { font-size: 32px; letter-spacing: -1px; }
+  .social-intro > p:last-child { font-size: 11px; color: #dce3cf; margin: 8px 0 0; }
+  .social-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: 12px; }
+  .social-card { --paper: #f0d8c9; position: relative; background: var(--paper); color: #352d27; border-radius: 5px 5px 12px 12px; box-shadow: 0 4px 0 #17281b55; }
+  .social-card[data-social="rednote"] { --paper: #f1e6b6; }
+  .social-card[data-social="facebook"] { --paper: #dce5c6; }
+  .social-card summary { position: relative; padding: 12px 14px 10px; border-radius: inherit; transition: transform 180ms, background 180ms; }
+  .social-card summary:focus-visible { outline-color: #f0dc93; }
+  .social-topline { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+  .social-badge { display: inline-flex; align-items: center; justify-content: center; width: 29px; height: 29px; }
+  .social-badge :global(svg) { width: 25px; height: 25px; }
+  .social-peek { width: 24px; height: 24px; border: 1px solid #352d2740; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 19px; line-height: 1; transition: transform 180ms; }
+  .social-card[open] .social-peek { transform: rotate(45deg); }
+  .social-name { display: block; font-size: 13px; font-weight: 700; }
+  .social-caption { display: block; font: italic 14px/1.3 var(--display); margin: 2px 0 10px; }
+  .social-status { display: block; border-top: 1px dashed #352d2750; padding-top: 7px; font-size: 9px; }
+  .social-note { padding: 2px 14px 14px; font-size: 11px; line-height: 1.6; overflow-wrap: anywhere; }
+  .social-note p { margin: 0; }
+  .social-note a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; text-decoration: underline; text-underline-offset: 4px; }
+  @media (hover: hover) and (pointer: fine) {
+    .social-card summary:hover { transform: translateY(-4px) rotate(-1deg); background: var(--paper); }
+    .social-card:nth-child(even) summary:hover { transform: translateY(-4px) rotate(1deg); }
+  }
+  @media (min-width: 601px) and (max-width: 900px) {
+    .footer-social { grid-template-columns: .7fr 1.5fr; gap: 20px; }
+    .social-intro h2 { font-size: 28px; }
+    .social-caption { font-size: 12px; min-height: 32px; }
+    .social-card summary { padding-inline: 10px; }
   }
   @media (max-width: 600px) {
+    .footer-social { grid-template-columns: 1fr; padding-block: 12px; gap: 10px; }
+    .social-kicker { margin-bottom: 3px; }
+    .social-intro h2 { font-size: 28px; }
+    .social-intro > p:last-child { margin-top: 5px; font-size: 10px; }
     .social-list { gap: 8px; }
-    .social-card { position: relative; flex-direction: column; justify-content: center; min-height: 100px; padding: 10px 5px; gap: 7px; text-align: center; }
+    .social-card summary { padding: 10px 8px 8px; }
+    .social-peek { width: 20px; height: 20px; font-size: 17px; }
+    .social-topline { margin-bottom: 5px; }
     .social-name { font-size: 11px; }
-    .social-status { font-size: 9px; }
-    .social-arrow { position: absolute; top: 3px; right: 6px; font-size: 13px; }
+    .social-caption { display: none; }
+    .social-status { margin-top: 8px; font-size: 8px; }
+    .social-note { padding: 2px 8px 10px; font-size: 10px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .social-card summary:hover { transform: none; }
   }
 </style>

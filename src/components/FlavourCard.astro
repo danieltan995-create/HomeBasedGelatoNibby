@@ -4,16 +4,30 @@ import { business } from '../data/business';
 import { canSelectFlavour, formatPrice, volumeLabel } from '../lib/order';
 import { getFlavourPresentation } from '../lib/flavour-presentation';
 import Arrow from './Arrow.astro';
+import Doodle from './Doodle.astro';
+import FlavourNotes from './FlavourNotes.astro';
 interface Props { flavour: Flavour; index: number; }
 const { flavour, index } = Astro.props;
 const preview = getFlavourPresentation(flavour);
 ---
 <article class={`flavour-card theme-${preview.theme}`} id={flavour.id} data-card={flavour.id} data-availability={flavour.availability}>
-  <div class="product-art">
-    <span class="product-number">0{index + 1} / {preview.comingSoon ? 'A LITTLE SNEAK PEEK' : 'THE NIBBY LINEUP'}</span>
-    <span class="product-doodle" aria-hidden="true">{preview.comingSoon ? '?' : flavour.theme === 'lemon' ? '☀' : flavour.theme === 'cocoa' ? '✧' : '♡'}</span>
-    <img src={preview.illustration} alt={preview.imageAlt} width="480" height="480" loading="lazy" />
-    <span class="size-label">{preview.comingSoon ? 'A SWEET SECRET, FOR NOW' : `${volumeLabel(flavour)} · lidded cup`}</span>
+  <div class="flavour-flip" data-flip-card={preview.comingSoon ? undefined : ''}>
+    <div class="flip-stage">
+      <div class="product-art flip-front">
+        <span class="product-number">0{index + 1} / {preview.comingSoon ? 'A LITTLE SNEAK PEEK' : 'THE NIBBY LINEUP'}</span>
+        <span class="product-doodle" aria-hidden="true">{preview.comingSoon ? '?' : <Doodle kind={flavour.theme === 'lemon' ? 'sun' : flavour.theme === 'cocoa' ? 'sparkle' : 'heart'} />}</span>
+        <img src={preview.illustration} alt={preview.imageAlt} width="480" height="480" loading="lazy" />
+        <span class="size-label">{preview.comingSoon ? 'A SWEET SECRET, FOR NOW' : `${volumeLabel(flavour)} · lidded cup`}</span>
+      </div>
+      {!preview.comingSoon && <div class="flip-back" id={`notes-${flavour.id}`} hidden aria-hidden="true" inert>
+        <p class="notes-eyebrow">THE LITTLE DETAILS</p>
+        <p class="notes-title">{preview.name}</p>
+        <div class="flavour-notes"><FlavourNotes flavour={flavour} /></div>
+      </div>}
+    </div>
+    {!preview.comingSoon && <button type="button" class="flip-toggle" data-flip-toggle hidden aria-expanded="false" aria-controls={`notes-${flavour.id}`}>
+      <span class="flip-hint"><Doodle kind="turn" /><span data-flip-label>Flip me for the scoop</span></span><span class="sr-only"> — {preview.name}</span>
+    </button>}
   </div>
   <div class="product-info">
     <h3>{preview.name}</h3>
@@ -21,7 +35,7 @@ const preview = getFlavourPresentation(flavour);
       <p class="teaser-description">Our next little happiness is still a secret. Stay curious — the reveal is coming soon.</p>
       <div class="teaser-status"><span class="coming-soon-label">Coming soon</span><span>Not available to order yet</span></div>
     </> : <>
-      <details class="product-details"><summary>A closer look <span aria-hidden="true">+</span></summary><div><p>{flavour.details}</p><p>{flavour.allergens ?? 'Allergen information is not confirmed. Please check with us before ordering if you have a food allergy.'}</p><p>{flavour.availability === 'sold-out' ? 'Currently unavailable.' : 'Availability will be confirmed when you enquire.'}</p></div></details>
+      <details class="product-details" data-flip-fallback><summary>A closer look <span aria-hidden="true">+</span></summary><div><FlavourNotes flavour={flavour} /></div></details>
       <div class="product-bottom"><span class="product-price">{formatPrice(flavour.priceMinor, business.currency)}</span><button class="add-cup" data-add={flavour.id} data-enhance hidden disabled={!canSelectFlavour(flavour)} aria-label={flavour.availability === 'sold-out' ? `${flavour.name}: unavailable` : `Add a cup of ${flavour.name} to your cups`}>{flavour.availability === 'sold-out' ? 'Unavailable' : 'Add a cup'}<Arrow /></button></div>
     </>}
   </div>
