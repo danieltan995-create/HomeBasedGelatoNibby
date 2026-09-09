@@ -182,7 +182,8 @@ async function expectSocialPlaceholders(page: Page) {
   await expect(socials.locator('.social-name')).toHaveText(['Instagram', 'REDnote', 'Facebook']);
   await expect(socials.getByText('Link coming soon', { exact: true })).toHaveCount(3);
   await expect(socials.locator('[data-state="pending"]')).toHaveCount(3);
-  await expect(socials.locator('a, button, [tabindex]')).toHaveCount(0);
+  await expect(socials.locator('a[href], button, [tabindex]')).toHaveCount(0);
+  await expect(socials.locator('details > summary')).toHaveCount(3);
   await expect(socials.locator('svg[aria-hidden="true"][focusable="false"] path')).toHaveCount(3);
   for (const icon of await socials.locator('svg').all()) {
     await expect(icon).toBeVisible();
@@ -190,9 +191,126 @@ async function expectSocialPlaceholders(page: Page) {
   }
 }
 
-test('social logos are present with honest, non-interactive profile placeholders', async ({ page }) => {
+test('social noticeboard opens local notes without pretending profile links are live', async ({ page }) => {
   await visitStorefront(page);
   await expectSocialPlaceholders(page);
+  for (const note of await page.locator('.social-card').all()) {
+    await note.locator('summary').click();
+    await expect(note).toHaveJSProperty('open', true);
+    await expect(note.locator('.social-note')).toBeVisible();
+    await note.locator('summary').focus();
+    await page.keyboard.press('Enter');
+    await expect(note).toHaveJSProperty('open', false);
+  }
+});
+
+test('decorative stars, hearts, suns and arrows use vectors instead of emoji glyphs', async ({ page }) => {
+  await visitStorefront(page);
+  await expect(page.locator('body')).not.toContainText(/[✳✧♡☀↗↙↳]/u);
+  await expect(page.locator('.wordmark-star svg, .hero-spark svg, .ribbon svg, .footer-wordmark svg')).toHaveCount(8);
+  for (const icon of await page.locator('.doodle').all()) {
+    await expect(icon).toHaveAttribute('aria-hidden', 'true');
+    await expect(icon).toHaveAttribute('focusable', 'false');
+  }
+});
+
+test('all three main navigation links stay present and reachable on narrow mobile widths', async ({ page }) => {
+  await visitStorefront(page);
+  const nav = page.getByRole('navigation', { name: 'Main navigation' });
+  const names = ['Our flavours', 'A little about us', 'How to order'];
+  for (const width of [360, 390, 768]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const name of names) {
+      const link = nav.getByRole('link', { name, exact: true });
+      await expect(link).toBeAttached();
+      await expect(link).not.toBeHidden();
+    }
+    // Every link is reachable via the nav's own horizontal scroll, not clipped off-screen.
+    const lastLink = nav.getByRole('link', { name: names[names.length - 1], exact: true });
+    await lastLink.evaluate((node) => node.scrollIntoView({ behavior: 'instant', inline: 'nearest' }));
+    const box = await lastLink.boundingBox();
+    expect(box!.x).toBeGreaterThanOrEqual(0);
+    expect(box!.x + box!.width).toBeLessThanOrEqual(width);
+  }
+  await page.setViewportSize({ width: 390, height: 900 });
+  await nav.getByRole('link', { name: 'How to order', exact: true }).evaluate((node) => node.scrollIntoView({ behavior: 'instant', inline: 'nearest' }));
+  await nav.getByRole('link', { name: 'How to order', exact: true }).click();
+  await expect(page).toHaveURL(/#how-to-order$/);
+});
+
+test('flavour art flips on activation, stays readable and leaves ordering controls in place', async ({ page, isMobile }) => {
+  await visitStorefront(page);
+  for (const flavour of selectableMenu) {
+    const product = card(page, flavour);
+    const flip = product.locator('[data-flip-card]');
+    const toggle = product.locator('[data-flip-toggle]');
+    const back = product.locator('.flip-back');
+    await flip.scrollIntoViewIfNeeded();
+    await settleVisuals(page);
+    if (!isMobile) {
+      // Hovering previews the notes visually but does not pin them open.
+      await toggle.hover();
+      await expect(flip.locator('.flip-stage')).toHaveCSS('transform', /matrix3d|rotate/);
+      await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+      await page.mouse.move(0, 0);
+      await expect(flip.locator('.flip-stage')).toHaveCSS('transform', 'none');
+    }
+    const before = await product.locator('.product-info').boundingBox();
+    // Click the image area rather than only the small hint at its bottom.
+    await toggle.click({ position: { x: 70, y: 90 } });
+    await settleVisuals(page);
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await expect(back).toHaveAttribute('aria-hidden', 'false');
+    await expect(back).toHaveJSProperty('inert', false);
+    await expect(product.locator('.flip-front')).toHaveJSProperty('inert', true);
+    await expect(back).toContainText('A little allergy note');
+    await expect(product.getByRole('img')).toHaveCount(0);
+    const after = await product.locator('.product-info').boundingBox();
+    expect(Math.abs(after!.y - before!.y)).toBeLessThanOrEqual(1);
+    await addCup(page, flavour);
+    // Clicking anywhere on the pinned-open card, not just the hint, flips it back.
+    await toggle.click({ position: { x: 70, y: 90 } });
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await toggle.focus();
+    await page.keyboard.press('Escape');
+    await expect(toggle).toBeFocused();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await page.keyboard.press('Space');
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await page.keyboard.press('Enter');
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  }
+  await expectCount(page, 2);
+  await expect(card(page, mystery).locator('[data-flip-toggle]')).toHaveCount(0);
+});
+
+test('flavour notes fit at every breakpoint, including enlarged text and reduced motion', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await visitStorefront(page);
+  for (const width of [360, 390, 768, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    for (const product of await page.locator('[data-flip-card]').all()) {
+      const toggle = product.locator('[data-flip-toggle]');
+      await toggle.click();
+      await expect(product.locator('.flip-stage')).toHaveCSS('transform', 'none');
+      await expect(product.locator('.flip-stage')).toHaveCSS('transition-duration', '0s');
+      await expect(product.locator('.flip-front')).toHaveCSS('visibility', 'hidden');
+      const notes = product.locator('.flavour-notes');
+      const notesBox = await notes.boundingBox();
+      const hintBox = await product.locator('.flip-hint').boundingBox();
+      expect(notesBox!.y + notesBox!.height).toBeLessThanOrEqual(hintBox!.y);
+      expect(await product.evaluate((node) => node.scrollWidth - node.clientWidth)).toBeLessThanOrEqual(1);
+      await toggle.click();
+    }
+  }
+  await page.addStyleTag({ content: '.flavour-notes, .flavour-notes .flavour-availability { font-size: 24px !important; }' });
+  const product = card(page, lemon);
+  await product.locator('[data-flip-toggle]').click();
+  const notesBox = await product.locator('.flavour-notes').boundingBox();
+  const hintBox = await product.locator('.flip-hint').boundingBox();
+  expect(notesBox!.y + notesBox!.height).toBeLessThanOrEqual(hintBox!.y);
 });
 
 test('floating Back to top works throughout the page and stays clear of the cart', async ({ page, isMobile }) => {
@@ -524,11 +642,11 @@ test('reduced motion removes animations, transitions and smooth scrolling withou
   expect(movingElements, 'Reduced-motion controls and artwork have no animated duration').toEqual([]);
 });
 
-test('page and nonempty drawer have no horizontal overflow at 360, 390, 768 and 1440 pixels', async ({ page }) => {
-  test.setTimeout(60_000);
-  await visitStorefront(page);
-  for (const width of [360, 390, 768, 1440]) {
-    await test.step(`${width}px`, async () => {
+// Separate cases keep each viewport isolated and avoid one long mobile-WebKit
+// flow exhausting its timeout before the last width. Assertion limits stay intact.
+for (const width of [360, 390, 768, 1440]) {
+  test(`page and nonempty drawer have no horizontal overflow at ${width} pixels`, async ({ page }) => {
+      await visitStorefront(page);
       await page.setViewportSize({ width, height: 900 });
       await settleVisuals(page);
       const expectPageFits = async () => {
@@ -552,9 +670,8 @@ test('page and nonempty drawer have no horizontal overflow at 360, 390, 768 and 
       await drawer(page).locator('[data-clear]').click();
       await closeButton(page).click();
       await expect(drawer(page)).toBeHidden();
-    });
-  }
-});
+  });
+}
 
 test('axe finds no WCAG A/AA violations on the settled page and nonempty dialog', async ({ page }) => {
   test.setTimeout(60_000);
@@ -564,6 +681,11 @@ test('axe finds no WCAG A/AA violations on the settled page and nonempty dialog'
   await settleVisuals(page);
   const pageScan = await new AxeBuilder({ page }).withTags(tags).analyze();
   expect.soft(pageScan.violations, 'Full-page WCAG scan').toEqual([]);
+  await card(page, lemon).locator('[data-flip-toggle]').click();
+  await page.locator('.social-card summary').first().click();
+  await settleVisuals(page);
+  const revealedScan = await new AxeBuilder({ page }).withTags(tags).analyze();
+  expect.soft(revealedScan.violations, 'Open flavour notes and social note WCAG scan').toEqual([]);
   const labelScan = await new AxeBuilder({ page }).withRules(['label-content-name-mismatch']).analyze();
   expect.soft(labelScan.violations, 'Accessible names include their visible labels').toEqual([]);
 
@@ -600,7 +722,10 @@ test.describe('without site JavaScript', () => {
     await expect(page.locator('[data-add]:visible, [data-open-order]:visible, [data-spotlight]:visible')).toHaveCount(0);
     await expect(drawer(page)).toBeHidden();
     await expect(page.locator('.noscript-note')).toContainText(/JavaScript/i);
-    await expectNoWhatsAppDestination(page);
+    // The configured test contact now permits a plain enquiry without the builder.
+    await expect(page.locator('.noscript-note').getByRole('link', { name: 'Enquire on WhatsApp' }))
+      .toHaveAttribute('href', 'https://wa.me/60172688120');
+    await expect(drawer(page).locator('[data-whatsapp][href]')).toHaveCount(0);
 
     const faq = page.locator('.faq-list details').first();
     await expect(faq).toHaveJSProperty('open', false);
@@ -613,6 +738,9 @@ test.describe('without site JavaScript', () => {
     await expect(faq).toHaveJSProperty('open', false);
     await expect(faq.locator('p')).toBeHidden();
     await expectSocialPlaceholders(page);
+    const socialNote = page.locator('.social-card').first();
+    await socialNote.locator('summary').click();
+    await expect(socialNote.locator('.social-note')).toBeVisible();
     const backTop = page.getByRole('link', { name: 'Back to top', exact: true });
     await expect(backTop).toBeInViewport();
     await backTop.click();

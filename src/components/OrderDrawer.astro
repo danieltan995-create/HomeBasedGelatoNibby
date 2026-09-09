@@ -1,6 +1,7 @@
 ---
 import { business } from '../data/business';
 import Arrow from './Arrow.astro';
+import Doodle from './Doodle.astro';
 ---
 <dialog class="order-drawer" id="order-dialog" aria-labelledby="order-title" aria-describedby="order-intro">
   <div class="drawer-header"><span class="eyebrow">A LITTLE HAPPINESS TO GO</span><button class="icon-button" data-close-order aria-label="Close your cups" autofocus>×</button></div>
@@ -8,7 +9,7 @@ import Arrow from './Arrow.astro';
   <p id="order-intro">A wish list for now. Your request is only confirmed after we chat.</p>
   <div class="drawer-scroll">
     <div data-order-lines></div>
-    <div class="empty-order" data-empty-order><span aria-hidden="true">♡</span><h3>A little empty in here.</h3><p>Your next happy moment starts with a flavour.</p><button class="button" data-close-order>Explore the flavours <Arrow /></button></div>
+    <div class="empty-order" data-empty-order><span aria-hidden="true"><Doodle kind="heart" /></span><h3>A little empty in here.</h3><p>Your next happy moment starts with a flavour.</p><button class="button" data-close-order>Explore the flavours <Arrow /></button></div>
     <div data-order-summary hidden>
       <div class="subtotal"><span>Product subtotal</span><strong data-subtotal>To be confirmed</strong></div>
       <p class="order-fineprint">Final prices, availability and any fulfilment fees need confirmation. {business.fulfilment ?? 'Pickup and delivery details are coming soon.'}</p>

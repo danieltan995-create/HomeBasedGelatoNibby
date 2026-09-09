@@ -1,0 +1,13 @@
+---
+interface Props { kind?: 'asterisk' | 'sparkle' | 'heart' | 'sun' | 'turn'; }
+const { kind = 'asterisk' } = Astro.props;
+const paths = {
+  asterisk: 'M12 3v18M3 12h18M5.6 5.6l12.8 12.8M5.6 18.4 18.4 5.6',
+  sparkle: 'M12 2c0 7-3 10-10 10 7 0 10 3 10 10 0-7 3-10 10-10-7 0-10-3-10-10Z',
+  heart: 'M12 21S2 15 2 8a5 5 0 0 1 10-1A5 5 0 0 1 22 8c0 7-10 13-10 13Z',
+  sun: 'M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5M17 12a5 5 0 1 1-10 0 5 5 0 0 1 10 0Z',
+  turn: 'M4 9a8 8 0 1 1 0 6M4 3v6h6',
+};
+---
+<svg class="doodle" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d={paths[kind]} stroke="currentColor" stroke-width={kind === 'asterisk' ? 2.8 : 1.7} stroke-linecap="round" stroke-linejoin="round" /></svg>
+<style>.doodle { display: inline-block; width: 1em; height: 1em; vertical-align: -.12em; overflow: visible; }</style>

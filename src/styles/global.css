@@ -51,8 +51,8 @@ em { color: var(--green); font-weight: inherit; }
 .wordmark { font: 600 48px/.8 var(--display); letter-spacing: -4px; position: relative; padding-right: 14px; padding-bottom: 12px; color: var(--green); }
 .wordmark-star { font-family: var(--body); font-size: 20px; position: absolute; top: -4px; right: -1px; letter-spacing: 0; }
 .wordmark-caption { font: 700 8px/1 var(--body); display: block; letter-spacing: 6px; text-align: center; margin: 11px -6px -6px 7px; }
-.site-header nav { display: flex; gap: 36px; margin-left: 65px; font-size: 12px; font-weight: 500; }
-.site-header nav a { padding-block: 13px; position: relative; }
+.site-header nav { display: flex; gap: 36px; margin-left: 65px; font-size: 12px; font-weight: 500; min-width: 0; }
+.site-header nav a { padding-block: 13px; position: relative; flex: 0 0 auto; }
 .site-header nav a::after { position: absolute; content: ''; height: 1px; background: var(--green); inset: auto 0 9px; transform: scaleX(0); transform-origin: left; transition: transform 160ms; }
 .site-header nav a:hover::after { transform: scaleX(1); }
 .bag-count { background: #f6f2db; color: var(--green); min-width: 21px; height: 21px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 11px; font-weight: 700; }
@@ -137,9 +137,40 @@ summary { list-style: none; }
 summary::-webkit-details-marker { display: none; }
 .product-details summary { display: flex; justify-content: space-between; align-items: center; min-height: 44px; border-bottom: 1px solid var(--line); padding: 8px 1px 12px; }
 .product-details summary span { font-size: 18px; color: var(--ink); }
-details[open] > summary > span { transform: rotate(45deg); }
+.product-details[open] > summary > span, .faq-list details[open] > summary > span { transform: rotate(45deg); }
 .product-details > div { padding-top: 16px; }
 .product-details p { margin-bottom: 10px; }
+/* Only the art flips; names, prices and Add a cup never move or disappear. */
+.flavour-flip { position: relative; }
+.flavour-flip[data-ready] { perspective: 1100px; }
+.flavour-flip[data-ready] .flip-stage { display: grid; grid-template-columns: minmax(0, 1fr); aspect-ratio: 1 / 1.04; transform-style: preserve-3d; transition: transform 420ms cubic-bezier(.2,.65,.3,1); }
+.flavour-flip[data-flipped="true"] .flip-stage { transform: rotateY(180deg); }
+.flavour-flip[data-ready] .flip-front, .flip-back { grid-area: 1 / 1; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+.flavour-flip[data-ready] .flip-front { min-width: 0; width: 100%; aspect-ratio: auto; min-height: 365px; padding-bottom: 65px; }
+.flavour-flip[data-ready] .size-label { bottom: 65px; }
+.flip-back { position: relative; min-width: 0; padding: 24px 24px 76px; border: 1px solid #352d271c; border-radius: 9px; background: var(--card-bg); color: var(--ink); transform: rotateY(180deg); }
+.notes-eyebrow { font-size: 8px; font-weight: 700; letter-spacing: 1.8px; color: var(--card-ink); margin-bottom: 12px; }
+.notes-title { font: italic 600 26px/1.1 var(--display); letter-spacing: -.8px; margin-bottom: 15px; }
+.flavour-notes { font-size: 12px; line-height: 1.6; }
+.flavour-notes p { margin-bottom: 12px; }
+.flavour-notes .flavour-availability { font-size: 10px; border-top: 1px dashed #352d2740; padding-top: 12px; margin: 0; }
+.flip-toggle { position: absolute; inset: 0; width: 100%; border-radius: 9px; padding: 0; background: transparent; display: flex; align-items: flex-end; justify-content: center; }
+.flip-hint { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 44px; margin: 0 12px 12px; padding: 10px 17px; border: 1px solid #352d2730; border-radius: 999px; background: var(--cream); color: var(--ink); box-shadow: 0 3px 0 #352d2710; font-size: 11px; font-weight: 500; }
+.flip-hint .doodle { font-size: 17px; transition: transform 200ms; }
+/* The whole card stays clickable in both directions, so flipping back never needs a precise target. */
+.flavour-flip[data-flipped="true"] .flip-front { pointer-events: none; }
+.flavour-flip[data-flipped="false"] .flip-back { pointer-events: none; }
+@media (hover: hover) and (pointer: fine) {
+  .flip-toggle:hover .flip-hint { background: #fffdf5; border-color: var(--card-ink); }
+  .flip-toggle:hover .doodle { transform: rotate(-35deg); }
+  /* Hovering previews the notes; a click pins them open regardless of the pointer. */
+  .flavour-flip[data-ready]:not([data-flipped="true"]):hover .flip-stage { transform: rotateY(180deg); }
+}
+@media (min-width: 601px) and (max-width: 950px) {
+  .flip-back { padding: 20px 15px 76px; }
+  .notes-title { font-size: 23px; }
+  .flip-hint { font-size: 10px; padding-inline: 10px; gap: 5px; }
+}
 .product-bottom { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; padding-top: 10px; }
 .product-price { font-size: 10px; color: var(--muted); }
 .add-cup { display: flex; min-height: 44px; padding: 8px 0 8px 14px; align-items: center; gap: 12px; font-weight: 700; font-size: 11px; background: transparent; color: var(--green); }
@@ -264,8 +295,10 @@ body.dialog-open .back-top, body:has(dialog[open]) .back-top { display: none; }
   html { scroll-padding-top: 120px; }
   .wrap { width: calc(100% - 48px); }
   .site-header { height: 88px; }
-  .site-header nav { gap: 18px; font-size: 11px; }
-  .site-header nav a:nth-child(2) { display: none; }
+  .site-header .wordmark, .site-header .bag-button { flex-shrink: 0; }
+  .site-header nav { flex: 1 1 0%; min-width: 0; gap: 18px; font-size: 11px; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+  .site-header nav::-webkit-scrollbar { display: none; }
+  .site-header nav a { scroll-snap-align: start; }
   .wordmark { font-size: 43px; }
   .hero { grid-template-columns: 1fr 1fr; padding-block: 45px; min-height: 500px; }
   h1 { font-size: 56px; letter-spacing: -3.5px; }
@@ -323,9 +356,8 @@ body.dialog-open .back-top, body:has(dialog[open]) .back-top { display: none; }
   .preview-extra { display: none; }
   .preview-mobile { display: inline; opacity: .8; border-left: 1px solid #ffffff55; padding-left: 7px; margin-left: 4px; }
   .site-header { height: 85px; gap: 15px; }
-  .site-header nav { margin-left: auto; }
+  .site-header nav { gap: 12px; padding-right: 4px; }
   .site-header nav a { font-size: 10px; }
-  .site-header nav a:last-child { display: none; }
   .wordmark { font-size: 41px; }
   .button-small { min-height: 40px; padding: 8px 11px; font-size: 10px; gap: 8px; }
   .bag-button svg { display: none; }
@@ -424,4 +456,7 @@ body.dialog-open .back-top, body:has(dialog[open]) .back-top { display: none; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .hero-cup-wrap:hover .hero-cup, .flavour-card:hover .product-art img, .button:hover:not(:disabled) { transform: none; }
+  .flavour-flip[data-ready] .flip-stage, .flip-back { transform: none; }
+  .flavour-flip[data-flipped="false"] .flip-back, .flavour-flip[data-flipped="true"] .flip-front { visibility: hidden; }
+  .flip-toggle:hover .doodle { transform: none; }
 }
