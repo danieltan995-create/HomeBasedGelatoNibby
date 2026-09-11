@@ -1,4 +1,5 @@
 const SHEET_NAME = 'Orders';
+const SPREADSHEET_ID_PROPERTY = 'ORDERS_SPREADSHEET_ID';
 const HEADERS = [
   'Request ID',
   'Created at',
@@ -47,7 +48,7 @@ function doPost(event) {
       '',
     ];
     const orderRow = sheet.getLastRow() + 1;
-    sheet.getRange(orderRow, 1, 1, row.length).setValues([row]);
+    sheet.appendRow(row);
     applyOrderStatusValidation(sheet, orderRow, 1);
     SpreadsheetApp.flush();
     const result = { accepted: true, duplicate: false, requestId: payload.requestId, sheet: sheet.getName(), row: orderRow };
@@ -98,20 +99,28 @@ function testAppendOrder() {
   ensureHeaders(sheet);
   const row = [payload.requestId, new Date(), payload.customerName, payload.preferredDate, payload.preferredTime, payload.fulfilment, payload.deliveryArea, '1 x Test order', '', '', payload.paymentMethod, 'PENDING', ''];
   const rowNumber = sheet.getLastRow() + 1;
-  sheet.getRange(rowNumber, 1, 1, row.length).setValues([row]);
+  sheet.appendRow(row);
   applyOrderStatusValidation(sheet, rowNumber, 1);
   SpreadsheetApp.flush();
   console.log(JSON.stringify({ ok: true, row: rowNumber, spreadsheetId: sheet.getParent().getId(), sheet: sheet.getName() }));
 }
 
 function setupOrdersSheet() {
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  if (!spreadsheet) throw new Error('Open the target spreadsheet and run setupOrdersSheet from its bound Apps Script project');
+  PropertiesService.getScriptProperties().setProperty(SPREADSHEET_ID_PROPERTY, spreadsheet.getId());
   const sheet = getOrdersSheet();
   ensureHeaders(sheet);
   return json({ ok: true, sheet: SHEET_NAME, headers: HEADERS });
 }
 
 function getOrdersSheet() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  const spreadsheetId = PropertiesService.getScriptProperties().getProperty(SPREADSHEET_ID_PROPERTY);
+  const spreadsheet = spreadsheetId
+    ? SpreadsheetApp.openById(spreadsheetId)
+    : SpreadsheetApp.getActiveSpreadsheet();
+  if (!spreadsheet) throw new Error('Missing orders spreadsheet configuration; run setupOrdersSheet once from the bound project');
+  const sheet = spreadsheet.getSheetByName(SHEET_NAME);
   if (!sheet) throw new Error('Missing Orders sheet');
   return sheet;
 }

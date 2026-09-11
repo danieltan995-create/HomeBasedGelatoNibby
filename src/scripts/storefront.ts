@@ -170,7 +170,7 @@ function initStorefront() {
     window.open(url, '_blank', 'noopener,noreferrer');
     void sendAudit(payload, business.auditWebhookUrl).then((logged) => {
       status.textContent = logged
-        ? `Request ${requestId} prepared and added to tracking. Confirm it in WhatsApp.`
+        ? `Request ${requestId} submitted to tracking. Confirm it in WhatsApp.`
         : `Request ${requestId} prepared. WhatsApp opened, but tracking could not be saved.`;
     });
   });
