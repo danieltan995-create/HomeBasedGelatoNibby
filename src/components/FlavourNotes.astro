@@ -4,5 +4,6 @@ interface Props { flavour: Flavour; }
 const { flavour } = Astro.props;
 ---
 <p>{flavour.details}</p>
+{flavour.ingredients && <div class="ingredient-list"><strong>Ingredients</strong><ul>{flavour.ingredients.map((ingredient) => <li>{ingredient}</li>)}</ul></div>}
 <p><strong>A little allergy note</strong><br />{flavour.allergens ?? 'Allergen information is not confirmed. Please check with us before ordering if you have a food allergy.'}</p>
 <p class="flavour-availability">{flavour.availability === 'sold-out' ? 'Currently unavailable.' : 'Availability will be confirmed when you enquire.'}</p>

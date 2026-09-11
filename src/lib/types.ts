@@ -22,6 +22,7 @@ export interface Flavour {
   priceMinor: number | null;
   availability: 'unconfirmed' | 'available' | 'sold-out' | 'coming-soon';
   details: string;
+  ingredients: readonly string[] | null;
   allergens: string | null;
   contentReviewed: boolean;
 }

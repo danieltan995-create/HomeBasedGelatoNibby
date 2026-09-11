@@ -15,8 +15,9 @@ export const flavours: Flavour[] = [
     volumeApproximate: true,
     priceMinor: 1190,
     availability: 'unconfirmed',
-    details: 'Meet Lemon Almond Nibs, part of our starting lineup. Full ingredient and allergen details are being finalised.',
-    allergens: null,
+    details: 'Bright lemon gelato with creamy dairy richness, fragrant zest and caramelized almond nibs for a crisp little crunch.',
+    ingredients: ['Fresh milk', 'Heavy cream', 'Glucose syrup', 'Icing sugar', 'Egg yolks', 'Milk powder', 'Lemon juice', 'Lemon zest', 'Caramelized almond nibs', 'Salt'],
+    allergens: 'Contains milk, egg and almond.',
     contentReviewed: false,
   },
   {
@@ -29,8 +30,9 @@ export const flavours: Flavour[] = [
     volumeApproximate: true,
     priceMinor: 1290,
     availability: 'unconfirmed',
-    details: 'Meet Dark Chocolate, part of our starting lineup. Full ingredient and allergen details are being finalised.',
-    allergens: null,
+    details: 'Deep, velvety chocolate gelato made with 72% dark chocolate and balanced by creamy dairy richness.',
+    ingredients: ['Fresh milk', 'Heavy cream', 'Glucose syrup', 'Icing sugar', 'Egg yolks', 'Milk powder', '72% dark chocolate', 'Salt'],
+    allergens: 'Contains milk and egg. Dark chocolate may contain other allergens; please check with us before ordering if you have a food allergy.',
     contentReviewed: false,
   },
   {
@@ -46,6 +48,7 @@ export const flavours: Flavour[] = [
     // use a generic mystery presentation and cannot be selected for an order.
     availability: 'coming-soon',
     details: 'Not prepared or released yet. Product details will be reviewed before the reveal.',
+    ingredients: null,
     allergens: null,
     contentReviewed: false,
   },

@@ -65,7 +65,8 @@ describe('initial data and flavour validation', () => {
         volumeMl: 140,
         volumeApproximate: true,
         availability: flavour.id === pistachioId ? 'coming-soon' : 'unconfirmed',
-        allergens: null,
+        ingredients: flavour.id === pistachioId ? null : expect.any(Array),
+        allergens: flavour.id === pistachioId ? null : expect.any(String),
         contentReviewed: false,
       });
     }
