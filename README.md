@@ -69,6 +69,17 @@ In draft mode, visitors can copy a message explicitly marked as a preview, but c
 
 Copying uses the browser clipboard on secure origins (HTTPS or localhost). If permission is denied, the message is selected for manual copying. Product information and native expandable sections remain accessible without JavaScript; the quantity builder requires it.
 
+### Connect Google Sheets audit logging
+
+The optional audit endpoint is implemented in [scripts/google-apps-script.gs](scripts/google-apps-script.gs). To connect it:
+
+1. Open the target spreadsheet, create an `Orders` sheet, and open its bound Apps Script project.
+2. Paste the script, run `setupOrdersSheet` once, and approve its spreadsheet permissions. This stores the spreadsheet ID for web-app executions and creates the headers.
+3. Deploy the project as a web app that executes as you and is accessible to anyone who needs to submit an order. After every script change, create a new deployment version or update the existing deployment.
+4. Confirm the deployed `/exec` URL returns `{"ok":true}` in a browser, then set that URL as `auditWebhookUrl` in [src/data/business.ts](src/data/business.ts) and rebuild the site.
+
+The browser cannot read the Apps Script response cross-origin, so a successful handoff is not proof that a row was stored. Check the Apps Script execution log and the `Orders` sheet after a marked test request. The handler rejects duplicate request IDs and returns an `accepted: false` JSON result for invalid requests.
+
 ## Before switching to live
 
 The build rejects incomplete live configuration. Do not bypass validation just to remove the draft banner.

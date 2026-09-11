@@ -170,7 +170,7 @@ function initStorefront() {
     window.open(url, '_blank', 'noopener,noreferrer');
     void sendAudit(payload, business.auditWebhookUrl).then((logged) => {
       status.textContent = logged
-        ? `Request ${requestId} prepared and added to tracking. Confirm it in WhatsApp.`
+        ? `Request ${requestId} submitted to tracking. Confirm it in WhatsApp.`
         : `Request ${requestId} prepared. WhatsApp opened, but tracking could not be saved.`;
     });
   });
@@ -182,11 +182,22 @@ function initStorefront() {
   });
 
   document.querySelectorAll<HTMLButtonElement>('[data-add]').forEach((button) => {
+    let addedTimer: ReturnType<typeof setTimeout> | undefined;
     button.addEventListener('click', () => {
       const id = button.dataset.add!;
       try {
         selection = setQuantity(selection, flavours, id, (selection[id] ?? 0) + 1);
         render();
+        const label = button.querySelector<HTMLElement>('.add-cup-label');
+        if (label) {
+          clearTimeout(addedTimer);
+          label.textContent = 'Added!';
+          button.dataset.added = '';
+          addedTimer = setTimeout(() => {
+            label.textContent = 'Add a cup';
+            delete button.dataset.added;
+          }, 1000);
+        }
         announce(`${flavours.find((item) => item.id === id)!.name} added to your cups.`);
       } catch (error) {
         announce(error instanceof Error ? error.message : 'Could not add this flavour.');

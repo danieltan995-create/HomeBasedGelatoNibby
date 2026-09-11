@@ -113,8 +113,8 @@ describe('order request messages', () => {
       const matching = productLines.filter((line) => line === `${selection[flavour.id]} × *${flavour.name}*`);
       expect(matching).toHaveLength(1);
     }
-    expect(message).toMatch(/prices.*awaiting confirmation/i);
-    expect(message).not.toMatch(/product subtotal/i);
+    expect(message).toContain('Product subtotal: RM 1,289.00');
+    expect(message).not.toMatch(/prices.*awaiting confirmation/i);
     expect(message).toMatch(/confirm availability, final price/i);
     expect(message).toMatch(/pickup\/delivery/i);
     expect(message).toMatch(/request, not a confirmed order/i);
@@ -210,7 +210,7 @@ describe('order request messages', () => {
   });
 
   it('keeps prices pending when currency is unknown, even with known prices', () => {
-    const message = buildOrderMessage({ [lemonId]: 1 }, reviewedMenu(), business);
+    const message = buildOrderMessage({ [lemonId]: 1 }, reviewedMenu(), { ...business, currency: null });
     expect(message).toMatch(/prices.*awaiting confirmation/i);
     expect(message).not.toMatch(/product subtotal/i);
   });

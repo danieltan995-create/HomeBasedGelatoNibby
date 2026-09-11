@@ -36,7 +36,7 @@ const preview = getFlavourPresentation(flavour);
       <div class="teaser-status"><span class="coming-soon-label">Coming soon</span><span>Not available to order yet</span></div>
     </> : <>
       <details class="product-details" data-flip-fallback><summary>A closer look <span aria-hidden="true">+</span></summary><div><FlavourNotes flavour={flavour} /></div></details>
-      <div class="product-bottom"><span class="product-price">{formatPrice(flavour.priceMinor, business.currency)}</span><button class="add-cup" data-add={flavour.id} data-enhance hidden disabled={!canSelectFlavour(flavour)} aria-label={flavour.availability === 'sold-out' ? `${flavour.name}: unavailable` : `Add a cup of ${flavour.name} to your cups`}>{flavour.availability === 'sold-out' ? 'Unavailable' : 'Add a cup'}<Arrow /></button></div>
+      <div class="product-bottom"><span class="product-price">{formatPrice(flavour.priceMinor, business.currency)}</span><button class="add-cup" data-add={flavour.id} data-enhance hidden disabled={!canSelectFlavour(flavour)} aria-label={flavour.availability === 'sold-out' ? `${flavour.name}: unavailable` : `Add a cup of ${flavour.name} to your cups`}><span class="add-cup-label">{flavour.availability === 'sold-out' ? 'Unavailable' : 'Add a cup'}</span><Arrow /></button></div>
     </>}
   </div>
 </article>
