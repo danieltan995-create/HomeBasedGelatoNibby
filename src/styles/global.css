@@ -172,13 +172,17 @@ summary::-webkit-details-marker { display: none; }
   .flip-hint { font-size: 10px; padding-inline: 10px; gap: 5px; }
 }
 .product-bottom { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; padding-top: 10px; }
-.product-price { font-size: 10px; color: var(--muted); }
+.product-price { display: inline-flex; align-items: center; min-height: 38px; padding: 7px 12px 7px 9px; gap: 8px; border: 1.5px solid var(--green); border-radius: 4px 9px 9px 4px; background: #f3c85b; color: var(--ink); font-size: 15px; font-weight: 700; line-height: 1; box-shadow: 3px 3px 0 #253d2d; transform: rotate(-2deg); transition: transform 180ms ease, box-shadow 180ms ease; }
+.product-price::before { content: ''; width: 7px; height: 7px; flex: 0 0 auto; border: 1px solid #253d2d; border-radius: 50%; background: #fff3c7; }
+.product-price:hover, .product-price:focus-visible { transform: rotate(0) translateY(-2px); box-shadow: 3px 5px 0 #253d2d; }
 .add-cup { display: inline-flex; min-height: 44px; padding: 9px 13px 9px 15px; align-items: center; gap: 13px; border: 1px solid var(--green); border-radius: 6px; font-weight: 700; font-size: 12px; line-height: 1; background: var(--green); color: #fffdf5; box-shadow: 0 3px 0 #253d2d; }
 .add-cup svg { width: 17px; }
 .add-cup:hover { background: #3f6248; transform: translateY(-1px); }
+.add-cup[data-added] { background: #d6a13d; border-color: #d6a13d; color: var(--ink); animation: add-cup-pop 420ms ease-out; }
 .add-cup:focus-visible { outline: 3px solid #d6a13d; outline-offset: 3px; }
 .add-cup:active { transform: translateY(2px); box-shadow: 0 1px 0 #253d2d; }
 .add-cup:disabled { opacity: .65; box-shadow: none; transform: none; }
+@keyframes add-cup-pop { 0% { transform: scale(1); } 45% { transform: scale(1.05) rotate(-1deg); } 100% { transform: scale(1); } }
 .menu-disclaimer { text-align: center; font-size: 10px; color: var(--muted); margin: 27px 0 0; }
 .story-section { background: #e9ecd9; position: relative; padding-block: 63px; }
 .story-section::before, .story-section::after { position: absolute; content: ''; height: 12px; left: 0; right: 0; background: radial-gradient(ellipse at 50% 100%, #e9ecd9 70%, transparent 73%) 0 0/30px 12px repeat-x; top: -11px; }

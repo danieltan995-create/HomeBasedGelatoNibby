@@ -49,10 +49,10 @@ describe('initial data and flavour validation', () => {
     ]);
   });
 
-  it('accepts the draft without inventing prices, contact details or reviewed content', () => {
+  it('accepts the draft with configured prices and unreviewed content', () => {
     expect(business).toMatchObject({
       mode: 'draft',
-      currency: null,
+      currency: 'MYR',
       whatsappNumber: '60172688120',
       siteUrl: null,
       fulfilment: null,
@@ -61,7 +61,7 @@ describe('initial data and flavour validation', () => {
     });
     for (const flavour of flavours) {
       expect(flavour).toMatchObject({
-        priceMinor: null,
+        priceMinor: flavour.id === lemonId ? 1190 : flavour.id === chocolateId ? 1290 : null,
         volumeMl: 140,
         volumeApproximate: true,
         availability: flavour.id === pistachioId ? 'coming-soon' : 'unconfirmed',
@@ -284,7 +284,7 @@ describe('subtotal', () => {
 
   it('returns null for an empty order or wholly unknown prices', () => {
     expect(calculateSubtotal({}, reviewedMenu(), 'MYR')).toBeNull();
-    expect(calculateSubtotal({ [lemonId]: 1, [chocolateId]: 2 }, flavours, 'MYR')).toBeNull();
+    expect(calculateSubtotal({ [lemonId]: 1, [chocolateId]: 2 }, flavours, null)).toBeNull();
   });
 
   it.each([lemonId, chocolateId, pistachioId])('returns null when only the selected %s price is unknown', (id) => {
